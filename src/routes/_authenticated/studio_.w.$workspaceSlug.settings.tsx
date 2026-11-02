@@ -13,7 +13,7 @@ import { RolesOverview } from "@/components/workspace/RolesOverview";
 import { isWorkspaceIconKey } from "@/lib/workspace-icons";
 import {
   activateScopeFromUrl, setWorkspaceIcon, checkRootWorkspaceSlug, claimCleanWorkspaceSlug, claimRootWorkspaceSlug, deleteWorkspace,
-  getWorkspaceContext, getWorkspaceSettings, renameWorkspace, setWorkspaceDomain, verifyWorkspaceDomain,
+  getWorkspaceContext, getWorkspaceSettings, renameWorkspace, renameWorkspaceSlugBase, setWorkspaceDomain, verifyWorkspaceDomain,
   type WorkspaceSettings as WsSettings,
 } from "@/lib/workspaces.functions";
 import { getActiveScopeStorage } from "@/lib/assets.functions";
@@ -174,9 +174,11 @@ function AddressCard({ ws, onDone }: { ws: WsSettings; onDone: () => void }) {
   const claimClean = useServerFn(claimCleanWorkspaceSlug);
   const claimRoot = useServerFn(claimRootWorkspaceSlug);
   const checkRoot = useServerFn(checkRootWorkspaceSlug);
+  const renameBase = useServerFn(renameWorkspaceSlugBase);
   const navigate = useNavigate();
   const clean = ws.slug.replace(/-[a-z0-9]{4}$/, "");
   const [slug, setSlug] = useState(clean);
+  const [base, setBase] = useState(clean);
   const [root, setRoot] = useState(ws.rootAlias ?? clean);
   const [rootCheck, setRootCheck] = useState<{ value: string; error: string | null } | null>(null);
   const [busy, setBusy] = useState(false);
@@ -207,13 +209,46 @@ function AddressCard({ ws, onDone }: { ws: WsSettings; onDone: () => void }) {
   }
 
   const live = rootCheck && rootCheck.value === root ? rootCheck : null;
+  const suffix = /-([a-z0-9]{4})$/.exec(ws.slug)?.[1] ?? null;
+  async function saveBase() {
+    setBusy(true);
+    try {
+      const res = await renameBase({ data: { workspaceId: ws.id, base } });
+      toast.success("Username bijgewerkt");
+      void navigate({ to: "/studio/w/$workspaceSlug/settings", params: { workspaceSlug: res.slug }, replace: true });
+    } catch (e) { toast.error(errText(e)); } finally { setBusy(false); }
+  }
+
   return (
     <section className={card}>
       <h2 className="font-medium">Adres</h2>
       <p className="text-sm text-muted-foreground">Huidig adres: rout.be/w/{ws.slug}</p>
+      <label className="block space-y-1 text-sm">
+        <span>Username</span>
+        <div className="flex gap-2">
+          <div className="flex min-w-0 flex-1 items-center rounded-md border border-input bg-background pr-3 focus-within:ring-2 focus-within:ring-ring">
+            <Input value={base} onChange={(e) => setBase(e.target.value.toLowerCase())} aria-label="Username" className="border-0 shadow-none focus-visible:ring-0" />
+            {suffix && <span className="shrink-0 font-mono text-muted-foreground">-{suffix}</span>}
+          </div>
+          <Button onClick={saveBase} disabled={busy || !base || base === clean}>Opslaan</Button>
+        </div>
+        {suffix && <span className="block text-xs text-muted-foreground">De laatste 4 tekens (-{suffix}) liggen vast; het deel ervoor kies je zelf.</span>}
+      </label>
+      <div className="flex flex-wrap items-center gap-2 rounded-lg bg-muted p-3 text-sm">
+        {ws.domain?.verified ? (
+          <span>Je domein is actief als username: <strong>rout.be/{ws.domain.name}</strong></span>
+        ) : (
+          <>
+            <span className="flex-1">{ws.domain ? `Verifieer ${ws.domain.name} om het als username te gebruiken.` : "Gebruik je eigen domeinnaam als username."}</span>
+            <Button size="sm" variant="outline" onClick={() => document.getElementById("eigen-domein")?.scrollIntoView({ behavior: "smooth" })}>
+              {ws.domain ? "Domein verifiëren" : "Domein koppelen"}
+            </Button>
+          </>
+        )}
+      </div>
       {!ws.canDropSuffix ? (
         <p className="text-sm text-muted-foreground">
-          Gratis workspaces houden een achtervoegsel van 4 tekens. Met Plus, Pro of Early Verified kies je een schoon adres en een root-adres.
+          Met Plus, Pro of Early Verified kies je een adres zonder achtervoegsel en een root-adres.
         </p>
       ) : (
         <>
@@ -310,7 +345,7 @@ function DomainCard({ ws, onDone }: { ws: WsSettings; onDone: () => void }) {
     try { await fn(); onDone(); } catch (e) { toast.error(errText(e)); } finally { setBusy(false); }
   }
   return (
-    <section className={card}>
+    <section id="eigen-domein" className={card}>
       <h2 className="font-medium">Eigen domein</h2>
       <div className="flex gap-2">
         <Input value={value} onChange={(e) => setValue(e.target.value)} placeholder="acme.be" aria-label="Domeinnaam" />

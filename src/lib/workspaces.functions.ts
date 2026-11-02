@@ -248,6 +248,31 @@ export const activateScopeFromUrl = createServerFn({ method: "POST" })
     return { ok: true as const, workspaceId: id };
   });
 
+/** Renames the chosen part of the workspace username; the 4-char suffix stays. Owner/admin only. */
+export const renameWorkspaceSlugBase = createServerFn({ method: "POST" })
+  .middleware([requireAuth])
+  .inputValidator((d) => z.object({ workspaceId: uuid, base: z.string().trim().toLowerCase().max(40) }).parse(d))
+  .handler(async ({ data, context }) => {
+    const { sql } = await import("@/lib/neon");
+    const { getWorkspaceRole } = await import("./workspaces.server");
+    const { slugWithKeptSuffix } = await import("./workspace-rules");
+    if (!canManageTeam(await getWorkspaceRole(context.userId, data.workspaceId))) throw new Error("Alleen eigenaars en admins wijzigen de workspace-username.");
+    const ws = ((await sql`select slug from public.workspaces where id = ${data.workspaceId} limit 1`) as { slug: string }[])[0];
+    if (!ws) throw new Error("Workspace niet gevonden.");
+    const next = slugWithKeptSuffix(ws.slug, data.base);
+    if ("error" in next) throw new Error(next.error);
+    if (next.slug === ws.slug) return { slug: ws.slug };
+    const taken = ((await sql`select 1 from public.workspaces where lower(slug) = ${next.slug} and id <> ${data.workspaceId} limit 1`) as unknown[]).length > 0;
+    if (taken) throw new Error("Deze username is al in gebruik.");
+    try {
+      await sql`update public.workspaces set slug = ${next.slug} where id = ${data.workspaceId}`;
+    } catch (e) {
+      if ((e as { code?: string }).code === "23505") throw new Error("Deze username is al in gebruik.");
+      throw e;
+    }
+    return { slug: next.slug };
+  });
+
 /** After an upgrade to Plus/Pro: drop the random suffix or set a clean slug. Owner/admin only. */
 export const claimCleanWorkspaceSlug = createServerFn({ method: "POST" })
   .middleware([requireAuth])
