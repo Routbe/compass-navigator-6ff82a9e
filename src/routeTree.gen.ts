@@ -47,6 +47,10 @@ import { Route as SecurityRouteImport } from './routes/security'
 import { Route as SelfHostingRouteImport } from './routes/self-hosting'
 import { Route as SignatureRouteImport } from './routes/signature'
 import { Route as SignupRouteImport } from './routes/signup'
+import { Route as SitemapCalendarsDotxmlRouteImport } from './routes/sitemap-calendars[.]xml'
+import { Route as SitemapProfilesDotxmlRouteImport } from './routes/sitemap-profiles[.]xml'
+import { Route as SitemapStaticDotxmlRouteImport } from './routes/sitemap-static[.]xml'
+import { Route as SitemapWorkspacesDotxmlRouteImport } from './routes/sitemap-workspaces[.]xml'
 import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as SolutionsRouteImport } from './routes/solutions'
 import { Route as SovereigntyRouteImport } from './routes/sovereignty'
@@ -543,6 +547,26 @@ const SignatureRoute = SignatureRouteImport.update({
 const SignupRoute = SignupRouteImport.update({
   id: '/signup',
   path: '/signup',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SitemapCalendarsDotxmlRoute = SitemapCalendarsDotxmlRouteImport.update({
+  id: '/sitemap-calendars.xml',
+  path: '/sitemap-calendars.xml',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SitemapProfilesDotxmlRoute = SitemapProfilesDotxmlRouteImport.update({
+  id: '/sitemap-profiles.xml',
+  path: '/sitemap-profiles.xml',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SitemapStaticDotxmlRoute = SitemapStaticDotxmlRouteImport.update({
+  id: '/sitemap-static.xml',
+  path: '/sitemap-static.xml',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SitemapWorkspacesDotxmlRoute = SitemapWorkspacesDotxmlRouteImport.update({
+  id: '/sitemap-workspaces.xml',
+  path: '/sitemap-workspaces.xml',
   getParentRoute: () => rootRouteImport,
 } as any)
 const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
@@ -2230,6 +2254,10 @@ export interface FileRoutesByFullPath {
   '/self-hosting': typeof SelfHostingRoute
   '/signature': typeof SignatureRoute
   '/signup': typeof SignupRoute
+  '/sitemap-calendars.xml': typeof SitemapCalendarsDotxmlRoute
+  '/sitemap-profiles.xml': typeof SitemapProfilesDotxmlRoute
+  '/sitemap-static.xml': typeof SitemapStaticDotxmlRoute
+  '/sitemap-workspaces.xml': typeof SitemapWorkspacesDotxmlRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/solutions': typeof SolutionsRouteWithChildren
   '/sovereignty': typeof SovereigntyRoute
@@ -2567,6 +2595,10 @@ export interface FileRoutesByTo {
   '/self-hosting': typeof SelfHostingRoute
   '/signature': typeof SignatureRoute
   '/signup': typeof SignupRoute
+  '/sitemap-calendars.xml': typeof SitemapCalendarsDotxmlRoute
+  '/sitemap-profiles.xml': typeof SitemapProfilesDotxmlRoute
+  '/sitemap-static.xml': typeof SitemapStaticDotxmlRoute
+  '/sitemap-workspaces.xml': typeof SitemapWorkspacesDotxmlRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/sovereignty': typeof SovereigntyRoute
   '/status': typeof StatusRoute
@@ -2909,6 +2941,10 @@ export interface FileRoutesById {
   '/self-hosting': typeof SelfHostingRoute
   '/signature': typeof SignatureRoute
   '/signup': typeof SignupRoute
+  '/sitemap-calendars.xml': typeof SitemapCalendarsDotxmlRoute
+  '/sitemap-profiles.xml': typeof SitemapProfilesDotxmlRoute
+  '/sitemap-static.xml': typeof SitemapStaticDotxmlRoute
+  '/sitemap-workspaces.xml': typeof SitemapWorkspacesDotxmlRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/solutions': typeof SolutionsRouteWithChildren
   '/sovereignty': typeof SovereigntyRoute
@@ -3258,6 +3294,10 @@ export interface FileRouteTypes {
     | '/self-hosting'
     | '/signature'
     | '/signup'
+    | '/sitemap-calendars.xml'
+    | '/sitemap-profiles.xml'
+    | '/sitemap-static.xml'
+    | '/sitemap-workspaces.xml'
     | '/sitemap.xml'
     | '/solutions'
     | '/sovereignty'
@@ -3595,6 +3635,10 @@ export interface FileRouteTypes {
     | '/self-hosting'
     | '/signature'
     | '/signup'
+    | '/sitemap-calendars.xml'
+    | '/sitemap-profiles.xml'
+    | '/sitemap-static.xml'
+    | '/sitemap-workspaces.xml'
     | '/sitemap.xml'
     | '/sovereignty'
     | '/status'
@@ -3936,6 +3980,10 @@ export interface FileRouteTypes {
     | '/self-hosting'
     | '/signature'
     | '/signup'
+    | '/sitemap-calendars.xml'
+    | '/sitemap-profiles.xml'
+    | '/sitemap-static.xml'
+    | '/sitemap-workspaces.xml'
     | '/sitemap.xml'
     | '/solutions'
     | '/sovereignty'
@@ -4285,6 +4333,10 @@ export interface RootRouteChildren {
   SelfHostingRoute: typeof SelfHostingRoute
   SignatureRoute: typeof SignatureRoute
   SignupRoute: typeof SignupRoute
+  SitemapCalendarsDotxmlRoute: typeof SitemapCalendarsDotxmlRoute
+  SitemapProfilesDotxmlRoute: typeof SitemapProfilesDotxmlRoute
+  SitemapStaticDotxmlRoute: typeof SitemapStaticDotxmlRoute
+  SitemapWorkspacesDotxmlRoute: typeof SitemapWorkspacesDotxmlRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   SolutionsRoute: typeof SolutionsRouteWithChildren
   SovereigntyRoute: typeof SovereigntyRoute
@@ -4695,6 +4747,34 @@ declare module '@tanstack/react-router' {
       path: '/signup'
       fullPath: '/signup'
       preLoaderRoute: typeof SignupRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/sitemap-calendars.xml': {
+      id: '/sitemap-calendars.xml'
+      path: '/sitemap-calendars.xml'
+      fullPath: '/sitemap-calendars.xml'
+      preLoaderRoute: typeof SitemapCalendarsDotxmlRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/sitemap-profiles.xml': {
+      id: '/sitemap-profiles.xml'
+      path: '/sitemap-profiles.xml'
+      fullPath: '/sitemap-profiles.xml'
+      preLoaderRoute: typeof SitemapProfilesDotxmlRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/sitemap-static.xml': {
+      id: '/sitemap-static.xml'
+      path: '/sitemap-static.xml'
+      fullPath: '/sitemap-static.xml'
+      preLoaderRoute: typeof SitemapStaticDotxmlRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/sitemap-workspaces.xml': {
+      id: '/sitemap-workspaces.xml'
+      path: '/sitemap-workspaces.xml'
+      fullPath: '/sitemap-workspaces.xml'
+      preLoaderRoute: typeof SitemapWorkspacesDotxmlRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/sitemap.xml': {
@@ -7450,6 +7530,10 @@ const rootRouteChildren: RootRouteChildren = {
   SelfHostingRoute: SelfHostingRoute,
   SignatureRoute: SignatureRoute,
   SignupRoute: SignupRoute,
+  SitemapCalendarsDotxmlRoute: SitemapCalendarsDotxmlRoute,
+  SitemapProfilesDotxmlRoute: SitemapProfilesDotxmlRoute,
+  SitemapStaticDotxmlRoute: SitemapStaticDotxmlRoute,
+  SitemapWorkspacesDotxmlRoute: SitemapWorkspacesDotxmlRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
   SolutionsRoute: SolutionsRouteWithChildren,
   SovereigntyRoute: SovereigntyRoute,
