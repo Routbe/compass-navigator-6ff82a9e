@@ -34,10 +34,11 @@ export const Route = createFileRoute("/api_/admin/mail-check")({
         if (!limit.ok) return tooManyRequests(limit.retryAfter);
         const { configuredOwnerEmails } = await import("@/lib/auth/owner-admin.server");
         const { sendMail } = await import("@/emails/send.server");
-        const results: { sent: boolean; error: string | null }[] = [];
+        const results: { sent: boolean }[] = [];
         for (const to of configuredOwnerEmails()) {
           const r = await sendMail({ to, subject: "ROUT beheer — testmail", html: "<p>Testmail van het beheerportaal.</p>", text: "Testmail van het beheerportaal.", tags: ["admin-mail-check"] });
-          results.push({ sent: r.sent, error: r.error ?? null });
+          if (r.error) console.error("[admin-mail-check] send failed", r.error);
+          results.push({ sent: r.sent });
         }
         return Response.json({ results }, { headers: { "cache-control": "no-store" } });
       },

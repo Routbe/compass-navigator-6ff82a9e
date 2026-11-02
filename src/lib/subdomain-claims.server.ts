@@ -1,3 +1,4 @@
+import { escapeMailParam } from "@/lib/mail-param-escape";
 /**
  * Root-subdomein claims: audit-log leesacties, handmatige promotie en de
  * geautomatiseerde DNS-propagatiecontrole. Server-only (Neon).
@@ -199,10 +200,10 @@ export async function resendClaimMails(claimId: string): Promise<{
       templateId: 2,
       to: [{ email: adminEmail }],
       params: {
-        requested_subdomain: subdomain,
-        cname_source: subdomain.replace(/\.rout\.be$/, ""),
-        user_name: userName,
-        user_email: email ?? "",
+        requested_subdomain: escapeMailParam(subdomain),
+        cname_source: escapeMailParam(subdomain.replace(/\.rout\.be$/), ""),
+        user_name: escapeMailParam(userName),
+        user_email: escapeMailParam(email ?? ""),
       },
     }),
     email
@@ -210,9 +211,9 @@ export async function resendClaimMails(claimId: string): Promise<{
           templateId: 3,
           to: [{ email }],
           params: {
-            user_name: userName,
-            requested_subdomain: subdomain,
-            active_subdomain: subdomain,
+            user_name: escapeMailParam(userName),
+            requested_subdomain: escapeMailParam(subdomain),
+            active_subdomain: escapeMailParam(subdomain),
           },
         })
       : Promise.resolve("failed"),
