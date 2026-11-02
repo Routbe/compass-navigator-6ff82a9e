@@ -629,6 +629,7 @@
   "menu.open": "Open menu",
   "menu.platform": "Platform",
   "menu.studio.hint": "Sovereign link-in-bio & micro-site builder",
+  "menu.agenda.hint": "Linked and sovereign booking pages",
   "menu.tools": "Tools",
   "merge_account.body": "Merge a second ROUT account into this one. Badges, verification, QR codes, history and linked identities move along.",
   "merge_account.error": "Merge failed. Check the code and your password.",

@@ -8,6 +8,7 @@ import {
   PanelsTopLeft,
   BookOpen,
   Palette,
+  CalendarDays,
 } from "lucide-react";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { ThemeToggle } from "@/components/ThemeToggle";

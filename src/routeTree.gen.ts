@@ -68,6 +68,7 @@ import { Route as DotwellKnownJwksDotjsonRouteImport } from './routes/[.]well-kn
 import { Route as DotwellKnownOpenapiDotjsonRouteImport } from './routes/[.]well-known.openapi[.]json'
 import { Route as DotwellKnownOpenidConfigurationRouteImport } from './routes/[.]well-known.openid-configuration'
 import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/admin'
+import { Route as AuthenticatedAgendaRouteImport } from './routes/_authenticated/agenda'
 import { Route as AuthenticatedConsoleRouteImport } from './routes/_authenticated/console'
 import { Route as AuthenticatedDomainsRouteImport } from './routes/_authenticated/domains'
 import { Route as AuthenticatedMyDataRouteImport } from './routes/_authenticated/my-data'
@@ -649,6 +650,11 @@ const DotwellKnownOpenidConfigurationRoute =
 const AuthenticatedAdminRoute = AuthenticatedAdminRouteImport.update({
   id: '/admin',
   path: '/admin',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
+const AuthenticatedAgendaRoute = AuthenticatedAgendaRouteImport.update({
+  id: '/agenda',
+  path: '/agenda',
   getParentRoute: () => AuthenticatedRoute,
 } as any)
 const AuthenticatedConsoleRoute = AuthenticatedConsoleRouteImport.update({
@@ -2245,6 +2251,7 @@ export interface FileRoutesByFullPath {
   '/.well-known/openapi.json': typeof DotwellKnownOpenapiDotjsonRoute
   '/.well-known/openid-configuration': typeof DotwellKnownOpenidConfigurationRoute
   '/admin': typeof AuthenticatedAdminRouteWithChildren
+  '/agenda': typeof AuthenticatedAgendaRoute
   '/console': typeof AuthenticatedConsoleRouteWithChildren
   '/domains': typeof AuthenticatedDomainsRoute
   '/my-data': typeof AuthenticatedMyDataRoute
@@ -2578,6 +2585,7 @@ export interface FileRoutesByTo {
   '/.well-known/jwks.json': typeof DotwellKnownJwksDotjsonRoute
   '/.well-known/openapi.json': typeof DotwellKnownOpenapiDotjsonRoute
   '/.well-known/openid-configuration': typeof DotwellKnownOpenidConfigurationRoute
+  '/agenda': typeof AuthenticatedAgendaRoute
   '/domains': typeof AuthenticatedDomainsRoute
   '/my-data': typeof AuthenticatedMyDataRoute
   '/settings': typeof AuthenticatedSettingsRoute
@@ -2922,6 +2930,7 @@ export interface FileRoutesById {
   '/.well-known/openapi.json': typeof DotwellKnownOpenapiDotjsonRoute
   '/.well-known/openid-configuration': typeof DotwellKnownOpenidConfigurationRoute
   '/_authenticated/admin': typeof AuthenticatedAdminRouteWithChildren
+  '/_authenticated/agenda': typeof AuthenticatedAgendaRoute
   '/_authenticated/console': typeof AuthenticatedConsoleRouteWithChildren
   '/_authenticated/domains': typeof AuthenticatedDomainsRoute
   '/_authenticated/my-data': typeof AuthenticatedMyDataRoute
@@ -3270,6 +3279,7 @@ export interface FileRouteTypes {
     | '/.well-known/openapi.json'
     | '/.well-known/openid-configuration'
     | '/admin'
+    | '/agenda'
     | '/console'
     | '/domains'
     | '/my-data'
@@ -3603,6 +3613,7 @@ export interface FileRouteTypes {
     | '/.well-known/jwks.json'
     | '/.well-known/openapi.json'
     | '/.well-known/openid-configuration'
+    | '/agenda'
     | '/domains'
     | '/my-data'
     | '/settings'
@@ -3946,6 +3957,7 @@ export interface FileRouteTypes {
     | '/.well-known/openapi.json'
     | '/.well-known/openid-configuration'
     | '/_authenticated/admin'
+    | '/_authenticated/agenda'
     | '/_authenticated/console'
     | '/_authenticated/domains'
     | '/_authenticated/my-data'
@@ -4830,6 +4842,13 @@ declare module '@tanstack/react-router' {
       path: '/admin'
       fullPath: '/admin'
       preLoaderRoute: typeof AuthenticatedAdminRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/agenda': {
+      id: '/_authenticated/agenda'
+      path: '/agenda'
+      fullPath: '/agenda'
+      preLoaderRoute: typeof AuthenticatedAgendaRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
     '/_authenticated/console': {
@@ -6969,6 +6988,7 @@ const AuthenticatedConsoleRouteWithChildren =
 
 interface AuthenticatedRouteChildren {
   AuthenticatedAdminRoute: typeof AuthenticatedAdminRouteWithChildren
+  AuthenticatedAgendaRoute: typeof AuthenticatedAgendaRoute
   AuthenticatedConsoleRoute: typeof AuthenticatedConsoleRouteWithChildren
   AuthenticatedDomainsRoute: typeof AuthenticatedDomainsRoute
   AuthenticatedMyDataRoute: typeof AuthenticatedMyDataRoute
@@ -6994,6 +7014,7 @@ interface AuthenticatedRouteChildren {
 
 const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
   AuthenticatedAdminRoute: AuthenticatedAdminRouteWithChildren,
+  AuthenticatedAgendaRoute: AuthenticatedAgendaRoute,
   AuthenticatedConsoleRoute: AuthenticatedConsoleRouteWithChildren,
   AuthenticatedDomainsRoute: AuthenticatedDomainsRoute,
   AuthenticatedMyDataRoute: AuthenticatedMyDataRoute,

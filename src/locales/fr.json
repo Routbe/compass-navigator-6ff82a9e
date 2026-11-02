@@ -629,6 +629,7 @@
   "menu.open": "Ouvrir le menu",
   "menu.platform": "Plateforme",
   "menu.studio.hint": "Constructeur souverain de link-in-bio et micro-site",
+  "menu.agenda.hint": "Pages de réservation liées et souveraines",
   "menu.tools": "Outils",
   "merge_account.body": "Fusionnez un second compte ROUT dans celui-ci. Badges, vérification, QR codes, historique et identités liées suivent.",
   "merge_account.error": "Échec de la fusion. Vérifiez le code et votre mot de passe.",
