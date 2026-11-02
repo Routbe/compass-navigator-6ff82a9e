@@ -7,7 +7,7 @@
 
 create table if not exists public.rout_calendars (
   id             uuid primary key default gen_random_uuid(),
-  owner_user_id  uuid not null references public.users (id) on delete cascade,
+  user_id  uuid not null references public.users (id) on delete cascade,
   workspace_id   uuid references public.workspaces (id) on delete cascade,
   mode           text not null default 'linked',
   public_id      text not null,
@@ -23,7 +23,7 @@ create table if not exists public.rout_calendars (
   constraint rout_calendars_title_check check (char_length(title) between 1 and 120)
 );
 create unique index if not exists rout_calendars_public_id on public.rout_calendars (public_id);
-create index if not exists rout_calendars_owner on public.rout_calendars (owner_user_id);
+create index if not exists rout_calendars_user on public.rout_calendars (user_id);
 
 do $$ begin
   if exists (select 1 from pg_roles where rolname = 'rout_app') then
@@ -36,8 +36,8 @@ revoke all on public.rout_calendars from public;
 alter table public.rout_calendars enable row level security;
 drop policy if exists rout_owner_all on public.rout_calendars;
 create policy rout_owner_all on public.rout_calendars
-  for all using (owner_user_id = public.rout_current_user_id())
-  with check (owner_user_id = public.rout_current_user_id());
+  for all using (user_id = public.rout_current_user_id())
+  with check (user_id = public.rout_current_user_id());
 
 -- Public lookup for /a/<public_id>: returns only what a visitor needs, never
 -- the owner id, so a sovereign page stays untraceable.

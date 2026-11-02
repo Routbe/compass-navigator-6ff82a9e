@@ -1474,6 +1474,21 @@ export interface PublicReservedHandlesRow {
   "created_at": string | Date;
 }
 
+export interface PublicRoutCalendarsRow {
+  "id": string;
+  "user_id": string;
+  "workspace_id": string | null;
+  "mode": string;
+  "public_id": string;
+  "title": string;
+  "description": string | null;
+  "event_type_id": string | null;
+  "is_active": boolean;
+  "expires_at": string | Date | null;
+  "created_at": string | Date;
+  "updated_at": string | Date;
+}
+
 export interface PublicSavedQrsRow {
   "id": string;
   "user_id": string;
@@ -2251,6 +2266,7 @@ export interface DbTables {
   "public.reserved_brand_releases": PublicReservedBrandReleasesRow;
   "public.reserved_brands": PublicReservedBrandsRow;
   "public.reserved_handles": PublicReservedHandlesRow;
+  "public.rout_calendars": PublicRoutCalendarsRow;
   "public.saved_qrs": PublicSavedQrsRow;
   "public.security_audit_checkpoints": PublicSecurityAuditCheckpointsRow;
   "public.security_audit_logs": PublicSecurityAuditLogsRow;

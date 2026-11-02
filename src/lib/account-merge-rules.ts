@@ -108,6 +108,7 @@ export const MERGE_TABLES: Readonly<Record<string, MergeTableRule>> = {
   booking_requests: r("reassign", undefined, "profile_id"),
   links: r("reassign", undefined, "profile_id"),
   api_keys: r("reassign"),
+  rout_calendars: r("reassign"),
   avatar_objects: r("reassign"),
   badge_events: r("reassign"),
   community_reviews: r("reassign"),
