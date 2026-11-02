@@ -1568,6 +1568,7 @@ export function ProfileEditor({ variant = "verified", pageMode = "profile", onPa
                 </AccordionContent>
               </AccordionItem>
 
+              {!isWorkspace && (<>
               <AccordionItem
                 value="identity_badges"
                 className="rounded-2xl border border-border bg-card px-4 sm:px-5"
@@ -1960,6 +1961,7 @@ export function ProfileEditor({ variant = "verified", pageMode = "profile", onPa
                   </section>
                 </AccordionContent>
               </AccordionItem>
+              </>)}
 
               {/* Steunpagina: enkel voor geverifieerde leden met een root-handle (server-side afgedwongen). */}
               <AccordionItem
