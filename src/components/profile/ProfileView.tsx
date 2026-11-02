@@ -128,13 +128,17 @@ export function ProfileView({
   profile,
   free = false,
   layout = "auto",
+  publicPath,
 }: {
   profile: ProfileRecord;
   free?: boolean;
+  /** Explicit public path (e.g. "/w/<slug>" for a workspace); overrides the /u/ vs root guess. */
+  publicPath?: string;
   /** "wide" toont links in twee kolommen (desktopvoorbeeld / brede schermen). */
   layout?: "auto" | "wide";
 }) {
   const { t: tx } = useTranslation();
+  const shownPath = publicPath ?? (profile.username ? `/${free ? "u/" : ""}${profile.username}` : null);
   const { t: tr, locale } = useI18n();
   const sendClick = useServerFn(recordLinkClickFn);
   /** Anonieme klikmeting; faalt stil zodat een link altijd opent. */
@@ -332,11 +336,11 @@ export function ProfileView({
          fontSize: prefs.typographyCustom || prefs.customDesign ? `${prefs.fontScale}%` : undefined,
       }}
     >
-      {profile.username && (
+      {shownPath && (
         <div className="absolute right-4 top-4 z-10">
           <ShareMenu
-            url={`https://rout.be/${free ? "u/" : ""}${profile.username}`}
-            handle={profile.username}
+            url={`https://rout.be${shownPath}`}
+            handle={profile.username ?? shownPath.split("/").pop() ?? ""}
             name={profile.display_name ?? ""}
             bio={shownBio || profile.tagline}
             avatarUrl={profile.avatar_url}
@@ -488,17 +492,15 @@ export function ProfileView({
         {/* Gratis leden tonen hun alias-namespace, Pro-leden hun schone handle.
             De subtitel is een subtiele link naar het live profiel. Een workspace
             heeft bewust géén username (username: null) — dan valt deze regel weg. */}
-        {profile.username && (
+        {shownPath && (
           <a
-            href={
-              free ? `https://rout.be/u/${profile.username}` : `https://rout.be/${profile.username}`
-            }
+            href={`https://rout.be${shownPath}`}
             target="_blank"
             rel="noopener noreferrer"
             className="mt-1 break-all text-center text-sm underline-offset-4 transition-opacity hover:underline hover:opacity-80"
             style={{ color: t.muted }}
           >
-            {free ? `rout.be/u/${profile.username}` : `rout.be/${profile.username}`}
+            {`rout.be${shownPath}`}
           </a>
         )}
         {prefs.locationVisible && prefs.locationBadge && (

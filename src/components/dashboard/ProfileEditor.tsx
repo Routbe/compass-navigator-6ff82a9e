@@ -2035,7 +2035,7 @@ export function ProfileEditor({ variant = "verified", pageMode = "profile", onPa
 
         {/* Live preview — desktop: volledig stationair naast de editor terwijl
             de formulieren links scrollen (z-10 < vaste header z-50) */}
-        <ProfileHeaderPreview previewDraft={previewDraft} free={previewFree} />
+        <ProfileHeaderPreview previewDraft={previewDraft} free={previewFree} publicPath={isWorkspace ? publicPath : undefined} />
       </div>
       </>
       )}
@@ -2139,7 +2139,7 @@ export function ProfileEditor({ variant = "verified", pageMode = "profile", onPa
               <div className="relative overflow-hidden rounded-[2rem] bg-background">
                 <span className="absolute left-1/2 top-2 z-10 h-1.5 w-16 -translate-x-1/2 rounded-full bg-foreground/25" />
                 <div className="scrollbar-slim aspect-[9/19.5] overflow-y-auto text-foreground">
-                  <ProfileView profile={previewDraft} free={previewFree} />
+                  <ProfileView profile={previewDraft} free={previewFree} publicPath={isWorkspace ? publicPath : undefined} />
                 </div>
               </div>
             </div>

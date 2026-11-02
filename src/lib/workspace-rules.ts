@@ -188,3 +188,11 @@ export function slugWithKeptSuffix(currentSlug: string, base: string): { slug: s
   if (!isValidWorkspaceSlug(slug)) return { error: "Deze naam is niet toegestaan of gereserveerd." };
   return { slug };
 }
+
+/**
+ * Public path of a workspace: always `/w/<slug>`, or `/<domain>` once its own
+ * domain is DNS-verified. Never `/u/` — that namespace is for people only.
+ */
+export function workspacePublicPath(slug: string, domain: { name: string | null; verified: boolean } | null): string {
+  return domain?.verified && domain.name ? `/${domain.name.toLowerCase()}` : `/w/${slug}`;
+}
