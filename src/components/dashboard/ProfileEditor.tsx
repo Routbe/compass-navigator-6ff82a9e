@@ -150,6 +150,7 @@ import { oauthAvatarOf } from "@/lib/oauth-avatar";
 import { BlueskyWizard } from "@/components/dashboard/BlueskyWizard";
 import { SocialIdentityVerify } from "@/components/settings/SocialIdentityVerify";
 import { WorkspaceSocialPanel } from "@/components/workspace/WorkspaceSocialPanel";
+import { WorkspaceBlueskyPanel } from "@/components/workspace/WorkspaceBlueskyPanel";
 import { LiveStatusAccordion } from "@/components/studio/LiveStatusAccordion";
 import { ShareMenu } from "@/components/profile/ShareMenu";
 import { DesignTemplatesPanel } from "@/components/settings/DesignTemplatesPanel";
@@ -1984,6 +1985,7 @@ export function ProfileEditor({ variant = "verified", pageMode = "profile", onPa
                 workspaceId={wsCanvas?.workspaceId ?? ""}
                 onVerified={() => setLoadAttempt((n) => n + 1)}
               />
+              <WorkspaceBlueskyPanel workspaceId={wsCanvas?.workspaceId ?? ""} />
               <WorkspaceSocialPanel workspaceId={wsCanvas?.workspaceId ?? ""} />
               </div>
             ) : !verified ? (
