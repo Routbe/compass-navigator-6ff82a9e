@@ -146,7 +146,7 @@ export function AppLayout({
         </div>
       </main>
 
-      {trustBadges && !isOsRoute && <TrustBadgesBar className="mt-10" />}
+      {trustBadges && !isOsRoute && <TrustBadgesBar className="mt-6" />}
       {isOsRoute ? <OsStatusLine /> : revealFooter ? <RevealedFooter /> : <Footer />}
       <BackToTop />
       <NameOnboardingDialog />
