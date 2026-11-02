@@ -2058,6 +2058,8 @@ export function ProfileEditor({ variant = "verified", pageMode = "profile", onPa
             <button type="button" onClick={() => setErrorOpen(true)} className="text-destructive underline">
               {t("studio.editor.notSaved")}
             </button>
+          ) : dirty && !saving && !handleOk ? (
+            <span className="text-destructive">{t("studio.editor.notSaved")}{handleProblem || strictIssue ? ` — ${handleProblem ?? strictIssue}` : ""}</span>
           ) : saving || dirty ? (
             <>
               <Loader2 className="h-3 w-3 animate-spin" aria-hidden /> {t("studio.editor.saving")}
