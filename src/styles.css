@@ -158,6 +158,7 @@ html {
   --ochre-foreground: 37 60% 15%;
 
   --destructive: 4 66% 48%;
+  --live: 142 71% 40%;
   --destructive-foreground: 40 43% 97%;
   --warning: 32 90% 44%;
   --warning-foreground: 40 43% 97%;
@@ -213,6 +214,7 @@ html {
   --ochre: 37 62% 48%;
   --ochre-foreground: 37 50% 96%;
   --destructive: 4 66% 48%;
+  --live: 142 69% 52%;
   --destructive-foreground: 42 31% 94%;
   --warning: 34 92% 55%;
   --warning-foreground: 30 6% 7%;
@@ -252,6 +254,7 @@ html {
   --color-popover: hsl(var(--popover));
   --color-popover-foreground: hsl(var(--popover-foreground));
   --color-primary: hsl(var(--primary));
+  --color-live: hsl(var(--live));
   --color-identity-verified: var(--identity-verified);
   --color-primary-foreground: hsl(var(--primary-foreground));
   --color-secondary: hsl(var(--secondary));

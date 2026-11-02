@@ -160,7 +160,7 @@ function OsStatusLine() {
       data-testid="os-status-line"
       className="sticky bottom-0 z-40 flex h-7 items-center justify-center gap-2 border-t border-border/60 bg-background/90 font-mono text-[11px] text-muted-foreground backdrop-blur"
     >
-      <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-primary" aria-hidden />
+      <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-live" aria-hidden />
       ROUT OS v2.5 · Alle systemen operationeel
     </footer>
   );
