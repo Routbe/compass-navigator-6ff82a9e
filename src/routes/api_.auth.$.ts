@@ -169,6 +169,24 @@ export async function handleAuthRequest({ request }: { request: Request }) {
       );
     }
 
+    // Birth date on every local sign-up; under 16 a separate parent email (db/0174).
+    let signupAge: { email: string; dob: string; parentEmail: string | null } | null = null;
+    if (request.method === "POST" && relativePath === "/sign-up/email") {
+      const { SIGNUP_DOB_HEADER, SIGNUP_PARENT_EMAIL_HEADER, signupAgeProblem } = await import("@/lib/minor-safety");
+      const dob = request.headers.get(SIGNUP_DOB_HEADER) ?? "";
+      const parentEmail = request.headers.get(SIGNUP_PARENT_EMAIL_HEADER) ?? "";
+      const body = (await request.clone().json().catch(() => ({}))) as { email?: unknown };
+      const email = typeof body.email === "string" ? body.email : "";
+      const problem = signupAgeProblem({ dob, parentEmail, email });
+      if (problem) {
+        return Response.json(
+          { code: problem, message: problem === "dob_invalid" ? "Vul een geldige geboortedatum in." : "Vul het e-mailadres van je ouder of voogd in (niet je eigen adres)." },
+          { status: 400, headers: { "cache-control": "no-store" } },
+        );
+      }
+      signupAge = { email, dob, parentEmail: parentEmail.trim().toLowerCase() || null };
+    }
+
     // Self-hosted ALTCHA proof required before Better Auth runs: no user is
     // created and no mail is sent without it. Social/OAuth stay open.
     if (request.method === "POST" && ALTCHA_PATHS.has(relativePath)) {
@@ -181,6 +199,14 @@ export async function handleAuthRequest({ request }: { request: Request }) {
     }
 
     const res = await createRoutAuth(request).handler(request);
+    if (signupAge && res.ok) {
+      try {
+        const { recordSignupAge } = await import("@/lib/minor-safety.server");
+        await recordSignupAge(signupAge.email, signupAge.dob, signupAge.parentEmail);
+      } catch (e) {
+        console.error("[auth] recording sign-up age failed", e instanceof Error ? e.message : e);
+      }
+    }
     if (relativePath === "/passkey/generate-authenticate-options" && res.ok) {
       // Ensure the browser requests biometric/PIN verification; the verified hook also checks UV.
       const options = await res.json() as Record<string, unknown>;

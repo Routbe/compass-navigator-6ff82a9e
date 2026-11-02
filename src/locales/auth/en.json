@@ -206,7 +206,7 @@
   "auth.signupConsent.terms": "Terms of Service",
   "auth.signupConsent.and": "and the",
   "auth.signupConsent.privacy": "Privacy Policy",
-  "auth.signupConsent.after": "and confirm that I am 16 or older (or have consent from a parent/guardian).",
+  "auth.signupConsent.after": "and confirm my details are correct.",
   "auth.signupConsent.required": "Tick the box to create your account.",
   "auth.signupConsent.implicitBefore": "By signing in you agree to the",
   "auth.signupConsent.termsShort": "Terms",

@@ -54,6 +54,7 @@ export function SecureShieldWalletCard() {
         data: { amountCents, origin: window.location.origin },
       });
       if (result.ok) window.location.href = result.url;
+      else if (result.reason === "parent_approval_sent") toast.success("Aanvraag naar je ouder gestuurd", { description: "Je ouder krijgt een betaallink die 48 uur geldig is." });
       else toast.error("Opwaarderen mislukt", { description: result.reason });
     } catch {
       toast.error("Opwaarderen mislukt");

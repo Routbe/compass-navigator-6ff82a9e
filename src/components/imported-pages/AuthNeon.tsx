@@ -36,6 +36,7 @@ import { useI18n } from "@/lib/i18n";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Checkbox } from "@/components/ui/checkbox";
 import { SIGNUP_CONSENT_HEADER, SIGNUP_CONSENT_VERSION, canSubmitSignUp } from "@/lib/signup-consent";
+import { SIGNUP_DOB_HEADER, SIGNUP_PARENT_EMAIL_HEADER, isMinorDob, signupAgeProblem } from "@/lib/minor-safety";
 
 /** Providers die via Better Auth's generic OAuth/OIDC-plugin lopen. */
 const GENERIC_OAUTH = new Set(["oidc", "infomaniak", "proton"]);
@@ -257,7 +258,8 @@ export default function AuthNeon({ initialMode = "magic" }: { initialMode?: Mode
         return;
       }
       setNeedTotp(false);
-      toast.success(t("auth.ui.toast.welcome"));
+      if (minor) toast.success("Account aangemaakt", { description: "We hebben je ouder of voogd een mail gestuurd om toestemming te geven." });
+      else toast.success(t("auth.ui.toast.welcome"));
       await refresh();
     } finally {
       setLoading(false);
@@ -363,9 +365,17 @@ export default function AuthNeon({ initialMode = "magic" }: { initialMode?: Mode
   };
 
   const [consented, setConsented] = useState(false);
+  const [dob, setDob] = useState("");
+  const [parentEmail, setParentEmail] = useState("");
+  const minor = isMinorDob(dob);
   const signUp = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!consented) { toast.error(t("auth.signupConsent.required")); return; }
+    const ageProblem = signupAgeProblem({ dob, parentEmail, email });
+    if (ageProblem) {
+      toast.error(ageProblem === "dob_invalid" ? "Vul een geldige geboortedatum in." : ageProblem === "parent_email_same" ? "Gebruik het e-mailadres van je ouder of voogd, niet je eigen adres." : "Vul het e-mailadres van je ouder of voogd in.");
+      return;
+    }
     if (unavailable) { toast.error(AUTH_UNAVAILABLE_TEXT[locale]); return; }
     if (adminPortal) return;
     if (!emailAccepted()) return;
@@ -377,7 +387,7 @@ export default function AuthNeon({ initialMode = "magic" }: { initialMode?: Mode
     const address = email.trim().toLowerCase();
     try {
       const result = await withAltcha(address, (proof) =>
-        authClient.signUp.email({ email: address, password, name: address.split("@")[0] ?? address, callbackURL, fetchOptions: { headers: { "x-altcha": proof, [SIGNUP_CONSENT_HEADER]: SIGNUP_CONSENT_VERSION } } }),
+        authClient.signUp.email({ email: address, password, name: address.split("@")[0] ?? address, callbackURL, fetchOptions: { headers: { "x-altcha": proof, [SIGNUP_CONSENT_HEADER]: SIGNUP_CONSENT_VERSION, [SIGNUP_DOB_HEADER]: dob, ...(minor ? { [SIGNUP_PARENT_EMAIL_HEADER]: parentEmail.trim().toLowerCase() } : {}) } } }),
       );
       const error = (result as { error?: { message?: string } } | undefined)?.error;
       if (error) {
@@ -620,6 +630,34 @@ export default function AuthNeon({ initialMode = "magic" }: { initialMode?: Mode
                 required
                 minLength={MIN_PASSWORD_LENGTH}
               />
+              <div className="space-y-1.5">
+                <label htmlFor="auth-signup-dob" className="text-sm font-medium">Geboortedatum</label>
+                <input
+                  id="auth-signup-dob"
+                  type="date"
+                  required
+                  value={dob}
+                  max={new Date().toISOString().slice(0, 10)}
+                  min="1900-01-01"
+                  onChange={(e) => setDob(e.target.value)}
+                  className="h-11 w-full rounded-lg border border-input bg-background px-3 text-sm text-foreground"
+                />
+              </div>
+              {minor && (
+                <div className="space-y-1.5 rounded-lg border border-border bg-muted/40 p-3">
+                  <label htmlFor="auth-signup-parent" className="text-sm font-medium">E-mail van je ouder of voogd</label>
+                  <input
+                    id="auth-signup-parent"
+                    type="email"
+                    required
+                    autoComplete="off"
+                    value={parentEmail}
+                    onChange={(e) => setParentEmail(e.target.value)}
+                    className="h-11 w-full rounded-lg border border-input bg-background px-3 text-sm text-foreground"
+                  />
+                  <p className="text-[11px] leading-relaxed text-muted-foreground">Je bent jonger dan 16. Je ouder krijgt een mail om toestemming te geven en je veiligheidsinstellingen te beheren.</p>
+                </div>
+              )}
               <div className="flex items-start gap-2.5 rounded-lg border border-border p-3">
                 <Checkbox
                   id="auth-signup-consent"
