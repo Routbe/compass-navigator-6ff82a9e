@@ -22,3 +22,9 @@
 - [x] Verified domain: private account serves on domain directly, not as rout.be/<domain>; workspaces may use domain as name
 - [x] Identity tab: Mastodon/social verification for personal (incl. alias) + workspace; workspace Bluesky via verified domain
 - [x] Restored maximilien.brussels verified design onto workspace maximilien-6yak (draft)
+
+## Nov 2 (14:48) request
+- [ ] Verify 1:1 import against the GitHub repository
+- [ ] Neon connection linked and reachable
+- [ ] Studio "Wijzigingen opslaan…" spins forever — fix
+- [ ] Workspace username: editable chosen part (4-char suffix fixed) + use verified domain as username button
