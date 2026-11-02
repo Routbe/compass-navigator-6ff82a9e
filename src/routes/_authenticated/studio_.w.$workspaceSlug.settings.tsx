@@ -93,7 +93,7 @@ function WorkspaceSettingsPage() {
       <section className={card}>
         <h2 className="font-medium">Adres, domein &amp; socials</h2>
         <p className="text-sm text-muted-foreground">Username, eigen domein, Bluesky en Mastodon beheer je nu op het tabblad Identiteit in de Studio.</p>
-        <Button asChild variant="outline" size="sm"><Link to="/studio/w/$workspaceSlug/studio" params={{ workspaceSlug: ws.slug }} search={{ tab: "identity" } as never}>Naar Identiteit</Link></Button>
+        <Button asChild variant="outline" size="sm"><a href={`/studio/w/${ws.slug}/studio?tab=identity`}>Naar Identiteit</a></Button>
       </section>
 
       <section className={card}>
