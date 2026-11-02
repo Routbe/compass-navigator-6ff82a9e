@@ -24,7 +24,7 @@
 - [x] Restored maximilien.brussels verified design onto workspace maximilien-6yak (draft)
 
 ## Nov 2 (14:48) request
-- [ ] Verify 1:1 import against the GitHub repository
-- [ ] Neon connection linked and reachable
-- [ ] Studio "Wijzigingen opslaan…" spins forever — fix
-- [ ] Workspace username: editable chosen part (4-char suffix fixed) + use verified domain as username button
+- [x] Verify 1:1 import against the GitHub repository (only intentional differences)
+- [x] Neon connection linked
+- [x] Studio "Wijzigingen opslaan…" spins forever — fix
+- [x] Workspace username: editable chosen part (4-char suffix fixed) + use verified domain as username button
