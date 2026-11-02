@@ -15,6 +15,7 @@ import { MobileMenu } from "@/components/MobileMenu";
 import { LanguageToggle } from "@/components/LanguageToggle";
 
 import { cn } from "@/lib/utils";
+import { useMatches } from "@tanstack/react-router";
 import { usePortalFrame } from "./PortalContext";
 import { useHeaderReveal } from "@/hooks/useHeaderReveal";
 import { useReveal } from "@/hooks/useReveal";
@@ -61,6 +62,8 @@ export function AppLayout({
   const hidden = useHeaderReveal();
   const { t } = useTranslation();
   const Frame = usePortalFrame();
+  // Signed-in (OS) routes drop the marketing footer for one quiet status line.
+  const isOsRoute = useMatches({ select: (ms) => ms.some((m) => m.routeId.startsWith("/_authenticated")) });
   const heading = (
           (crumbs?.length || title) ? (
             <div className="mb-6 grid grid-cols-1 items-end gap-4 sm:flex sm:flex-wrap sm:justify-between">
@@ -143,11 +146,23 @@ export function AppLayout({
         </div>
       </main>
 
-      {trustBadges && <TrustBadgesBar className="mt-10" />}
-      {revealFooter ? <RevealedFooter /> : <Footer />}
+      {trustBadges && !isOsRoute && <TrustBadgesBar className="mt-10" />}
+      {isOsRoute ? <OsStatusLine /> : revealFooter ? <RevealedFooter /> : <Footer />}
       <BackToTop />
       <NameOnboardingDialog />
     </div>
+  );
+}
+
+function OsStatusLine() {
+  return (
+    <footer
+      data-testid="os-status-line"
+      className="sticky bottom-0 z-40 flex h-7 items-center justify-center gap-2 border-t border-border/60 bg-background/90 font-mono text-[11px] text-muted-foreground backdrop-blur"
+    >
+      <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-live" aria-hidden />
+      ROUT OS v2.5 · Alle systemen operationeel
+    </footer>
   );
 }
 

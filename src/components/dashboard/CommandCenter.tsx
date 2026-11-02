@@ -1,8 +1,17 @@
-import { useState, type ReactNode } from "react";
+import { useEffect, useState, type ReactNode } from "react";
+import { QRCodeCanvas } from "qrcode.react";
+import { toast } from "sonner";
 import { useServerFn } from "@tanstack/react-start";
 import {
   ArrowRight,
   ArrowUpRight,
+  Check,
+  Copy,
+  Download,
+  Eye,
+  EyeOff,
+  Plus,
+  SlidersHorizontal,
   AtSign,
   BarChart3,
   CalendarDays,
@@ -23,12 +32,12 @@ import { BrandLoader } from "@/components/BrandLoader";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Switch } from "@/components/ui/switch";
-import { Link, useNavigate } from "@/lib/router-compat";
+import { Link } from "@/lib/router-compat";
 import { useAuth } from "@/hooks/useAuth";
 import { getCommandCenter, type ChronosEvent, type ChronosKind, type CommandCenterData } from "@/lib/command-center.functions";
 import { useLocalFirst } from "@/lib/local-first/useLocalFirst";
 import { useRelayStore } from "@/lib/local-first/useRelayStore";
-import { parseOmniInput } from "@/lib/omni-parser";
+import { plural } from "@/lib/plural";
 import { cn } from "@/lib/utils";
 
 const KIND_ICON: Record<ChronosKind, typeof Inbox> = {
@@ -58,7 +67,6 @@ function relative(at: string): string {
   return rtf.format(Math.round(diff / 86400), "day");
 }
 
-const fmt = (n: number | null | undefined) => (n == null ? "—" : String(n));
 
 function Widget({
   to,
@@ -128,31 +136,85 @@ function Widget({
   );
 }
 
+function normaliseUrl(raw: string): string | null {
+  const v = raw.trim();
+  if (!v) return null;
+  try {
+    const u = new URL(/^[a-z][a-z0-9+.-]*:/i.test(v) ? v : `https://${v}`);
+    return u.protocol === "http:" || u.protocol === "https:" ? u.toString() : null;
+  } catch {
+    return null;
+  }
+}
+
+/** In-place QR: paste, generate, copy or download without leaving the cockpit. */
 function QuickQr() {
-  const nav = useNavigate();
   const [value, setValue] = useState("");
-  const intent = parseOmniInput(value);
+  const [url, setUrl] = useState<string | null>(null);
+  const [copied, setCopied] = useState(false);
+  const candidate = normaliseUrl(value);
+  const download = () => {
+    const canvas = document.getElementById("quick-qr-canvas") as HTMLCanvasElement | null;
+    if (!canvas) return;
+    const a = document.createElement("a");
+    a.href = canvas.toDataURL("image/png");
+    a.download = "rout-qr.png";
+    a.click();
+  };
+  const copy = async () => {
+    const canvas = document.getElementById("quick-qr-canvas") as HTMLCanvasElement | null;
+    try {
+      if (canvas && "ClipboardItem" in window) {
+        const blob = await new Promise<Blob | null>((r) => canvas.toBlob(r, "image/png"));
+        if (blob) await navigator.clipboard.write([new ClipboardItem({ "image/png": blob })]);
+      } else if (url) {
+        await navigator.clipboard.writeText(url);
+      }
+      setCopied(true);
+      setTimeout(() => setCopied(false), 1500);
+    } catch {
+      toast.error("Kopiëren lukte niet");
+    }
+  };
   return (
-    <form
-      className="flex items-center gap-2 rounded-xl border border-border bg-background p-1.5"
-      onSubmit={(e) => {
-        e.preventDefault();
-        if (intent.kind === "url") nav(intent.destination);
-      }}
-    >
-      <input
-        value={value}
-        onChange={(e) => setValue(e.target.value)}
-        placeholder="https://…"
-        inputMode="url"
-        aria-label="URL voor een snelle QR-code"
-        className="h-9 min-w-0 flex-1 bg-transparent px-2 font-mono text-sm outline-none placeholder:text-muted-foreground"
-      />
-      <Button type="submit" size="sm" className="h-9 shrink-0 rounded-lg" disabled={intent.kind !== "url"}>
-        <ArrowRight className="h-4 w-4" />
-        <span className="sr-only">QR maken</span>
-      </Button>
-    </form>
+    <div className="space-y-3">
+      <form
+        className="flex items-center gap-2 rounded-xl border border-border bg-background p-1.5"
+        onSubmit={(e) => {
+          e.preventDefault();
+          if (candidate) setUrl(candidate);
+        }}
+      >
+        <input
+          value={value}
+          onChange={(e) => setValue(e.target.value)}
+          placeholder="https://…"
+          inputMode="url"
+          aria-label="URL voor een snelle QR-code"
+          className="h-9 min-w-0 flex-1 bg-transparent px-2 font-mono text-sm outline-none placeholder:text-muted-foreground"
+        />
+        <Button type="submit" size="sm" className="h-9 shrink-0 rounded-lg" disabled={!candidate}>
+          <ArrowRight className="h-4 w-4" />
+          <span className="sr-only">QR maken</span>
+        </Button>
+      </form>
+      {url ? (
+        <div className="flex items-center gap-3">
+          <div className="rounded-lg bg-white p-2">
+            <QRCodeCanvas id="quick-qr-canvas" value={url} size={112} marginSize={1} />
+          </div>
+          <div className="flex min-w-0 flex-1 flex-col gap-1.5">
+            <p className="truncate font-mono text-[11px] text-muted-foreground">{url}</p>
+            <Button size="sm" variant="outline" className="h-8 justify-start gap-1.5" onClick={() => void copy()}>
+              {copied ? <Check className="h-3.5 w-3.5" /> : <Copy className="h-3.5 w-3.5" />} {copied ? "Gekopieerd" : "Kopiëren"}
+            </Button>
+            <Button size="sm" variant="outline" className="h-8 justify-start gap-1.5" onClick={download}>
+              <Download className="h-3.5 w-3.5" /> PNG
+            </Button>
+          </div>
+        </div>
+      ) : null}
+    </div>
   );
 }
 
@@ -165,8 +227,14 @@ function RelayWidget({ userId, connectedApps }: { userId: string; connectedApps:
       to="/dashboard/identity"
       icon={Fingerprint}
       eyebrow="Identity Relays"
-      title={`${active} actieve relay${active === 1 ? "" : "s"}`}
-      hint={`${fmt(connectedApps)} gekoppelde apps · apps zien alleen je ROUT-alias`}
+      title={plural(active, "actieve relay", "actieve relays")}
+      hint={
+        active > 0
+          ? `${plural(active, "app ziet", "apps zien")} alleen je ROUT-alias`
+          : connectedApps
+            ? `${plural(connectedApps, "gekoppelde app", "gekoppelde apps")} nog zonder relay`
+            : "Apps zien alleen je ROUT-alias"
+      }
       className="sm:col-span-2"
     >
       {store.relays === null ? (
@@ -194,7 +262,7 @@ function RelayWidget({ userId, connectedApps }: { userId: string; connectedApps:
       )}
       {store.pending > 0 ? (
         <p className="mt-2 flex items-center gap-1.5 text-[11px] text-muted-foreground">
-          <Loader2 className="h-3 w-3 animate-spin" /> {store.pending} wijziging(en) synchroniseren…
+          <Loader2 className="h-3 w-3 animate-spin" /> {plural(store.pending, "wijziging", "wijzigingen")} synchroniseren…
         </p>
       ) : null}
     </Widget>
@@ -204,40 +272,161 @@ function RelayWidget({ userId, connectedApps }: { userId: string; connectedApps:
 function ChronosStream({ events, syncing }: { events: ChronosEvent[]; syncing: boolean }) {
   const shown = events.length ? events : EXAMPLE_EVENTS;
   return (
-    <aside className="min-w-0 rounded-2xl border border-border bg-card p-5 lg:sticky lg:top-20 lg:max-h-[calc(100vh-6rem)] lg:overflow-y-auto" aria-label="Chronos Stream">
+    <aside
+      className="min-w-0 rounded-2xl border border-border bg-card p-5 font-mono lg:sticky lg:top-20 lg:max-h-[calc(100vh-6rem)] lg:overflow-y-auto"
+      aria-label="Chronos Stream"
+    >
       <div className="flex items-center justify-between gap-2">
-        <h2 className="text-[11px] uppercase tracking-[0.18em] text-muted-foreground">Chronos Stream</h2>
+        <h2 className="flex items-center gap-2 text-[11px] uppercase tracking-[0.18em] text-muted-foreground">
+          <span className="relative flex h-2 w-2" aria-hidden>
+            <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-live opacity-60" />
+            <span className="relative inline-flex h-2 w-2 rounded-full bg-live" />
+          </span>
+          Chronos Stream · live
+        </h2>
         {syncing ? <Loader2 className="h-3.5 w-3.5 animate-spin text-muted-foreground" aria-label="Synchroniseren" /> : null}
       </div>
       {!events.length ? (
-        <p className="mt-2 text-xs text-muted-foreground">Nog geen gebeurtenissen — zo ziet je tijdlijn eruit.</p>
+        <p className="mt-2 text-[11px] text-muted-foreground">&gt; nog geen gebeurtenissen — voorbeeld van je tijdlijn</p>
       ) : null}
-      <ol className="relative mt-5 space-y-5 border-l border-border pl-5">
+      <ol className="mt-4 space-y-3 text-[12px]">
         {shown.map((ev) => {
           const Icon = KIND_ICON[ev.kind];
           return (
-            <li key={ev.id} className="relative">
-              <span className="absolute -left-[31px] top-0 grid h-5 w-5 place-items-center rounded-full border border-border bg-background">
-                <Icon className="h-3 w-3 text-foreground" aria-hidden />
-              </span>
-              <div className="flex items-baseline justify-between gap-3">
-                <p className="min-w-0 text-sm font-medium text-foreground">{ev.title}</p>
+            <li key={ev.id} className="border-l border-border pl-3">
+              <div className="flex items-baseline gap-2">
+                <Icon className="h-3 w-3 shrink-0 translate-y-0.5 text-muted-foreground" aria-hidden />
+                <p className="min-w-0 flex-1 text-foreground">{ev.title}</p>
                 {ev.at ? (
-                  <time dateTime={ev.at} className="shrink-0 text-[11px] text-muted-foreground">
+                  <time dateTime={ev.at} className="shrink-0 text-[10px] text-muted-foreground">
                     {relative(ev.at)}
                   </time>
                 ) : (
-                  <Badge variant="outline" className="shrink-0 text-[10px] font-normal">
-                    Voorbeeld
+                  <Badge variant="outline" className="shrink-0 font-mono text-[10px] font-normal">
+                    voorbeeld
                   </Badge>
                 )}
               </div>
-              {ev.detail ? <p className="mt-0.5 line-clamp-2 text-xs text-muted-foreground">{ev.detail}</p> : null}
+              {ev.detail ? <p className="mt-0.5 line-clamp-2 pl-5 text-[11px] text-muted-foreground">{ev.detail}</p> : null}
             </li>
           );
         })}
       </ol>
+      <Button asChild variant="outline" size="sm" className="mt-5 w-full gap-1.5 font-mono text-xs">
+        <Link to="/my-data">
+          <ShieldCheck className="h-3.5 w-3.5" /> Volledig audit-register
+        </Link>
+      </Button>
     </aside>
+  );
+}
+
+function AgendaWidget({ c }: { c: CommandCenterData | null }) {
+  const today = c?.todayBookings ?? [];
+  return (
+    <Widget
+      icon={CalendarDays}
+      eyebrow="Agenda & Boekingen"
+      title={today.length ? `${plural(today.length, "afspraak", "afspraken")} vandaag` : "Vandaag vrij"}
+      hint={
+        c?.upcomingBookings
+          ? `${plural(c.upcomingBookings, "aankomende afspraak", "aankomende afspraken")}${c.nextBookingAt ? ` · volgende ${new Date(c.nextBookingAt).toLocaleString("nl-BE", { dateStyle: "short", timeStyle: "short" })}` : ""}`
+          : "Geen aankomende afspraken."
+      }
+    >
+      {today.length ? (
+        <ul className="mb-3 divide-y divide-border rounded-xl border border-border">
+          {today.map((b) => (
+            <li key={b.id} className="flex items-center gap-3 px-3 py-2 text-sm">
+              <span className="font-mono text-xs text-muted-foreground">
+                {new Date(b.at).toLocaleTimeString("nl-BE", { hour: "2-digit", minute: "2-digit" })}
+              </span>
+              <span className="truncate">{b.guest}</span>
+            </li>
+          ))}
+        </ul>
+      ) : null}
+      <div className="flex flex-wrap gap-2">
+        <Button asChild size="sm" className="gap-1.5">
+          <Link to="/agenda">
+            <Plus className="h-4 w-4" /> Boeking
+          </Link>
+        </Button>
+        <Button asChild size="sm" variant="ghost">
+          <Link to="/studio/booking">Beschikbaarheid</Link>
+        </Button>
+      </div>
+    </Widget>
+  );
+}
+
+/** Zero-state modules collapse into one compact status bar. */
+function SystemPulse({ items }: { items: { label: string; to: string }[] }) {
+  if (!items.length) return null;
+  return (
+    <div className="flex flex-wrap items-center gap-2 rounded-xl border border-border bg-card px-3 py-2 font-mono text-[11px] text-muted-foreground sm:col-span-2 xl:col-span-3">
+      <span className="uppercase tracking-[0.18em]">System pulse</span>
+      {items.map((i) => (
+        <Link key={i.label} to={i.to} className="rounded-full border border-border px-2 py-0.5 hover:border-border-ink hover:text-foreground">
+          {i.label}
+        </Link>
+      ))}
+    </div>
+  );
+}
+
+type WidgetId = "relays" | "hub" | "qr" | "inbox" | "agenda" | "social";
+const WIDGET_LABEL: Record<WidgetId, string> = {
+  relays: "Identity Relays",
+  hub: "Profiel Hub",
+  qr: "Snelle QR",
+  inbox: "Unified Inbox",
+  agenda: "Agenda",
+  social: "Social & Prikbord",
+};
+
+/** Hidden widgets per device; the foundation for a rearrangeable board. */
+function useDashboardLayout(userId: string | undefined) {
+  const key = userId ? `rout:dashboard-hidden:${userId}` : null;
+  const [hidden, setHidden] = useState<WidgetId[]>([]);
+  useEffect(() => {
+    if (!key) return;
+    try {
+      const raw = window.localStorage.getItem(key);
+      if (raw) setHidden(JSON.parse(raw) as WidgetId[]);
+    } catch {
+      /* ignore corrupt layout */
+    }
+  }, [key]);
+  const toggle = (id: WidgetId) =>
+    setHidden((prev) => {
+      const next = prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id];
+      if (key) window.localStorage.setItem(key, JSON.stringify(next));
+      return next;
+    });
+  return { hidden, toggle };
+}
+
+function Slot({ id, editing, hidden, onToggle, className, children }: {
+  id: WidgetId; editing: boolean; hidden: boolean; onToggle: (id: WidgetId) => void; className?: string; children: ReactNode;
+}) {
+  if (hidden && !editing) return null;
+  return (
+    <div className={cn("relative min-w-0 [&>*]:h-full", editing && "rounded-2xl ring-1 ring-dashed ring-border", hidden && "opacity-40", className)}>
+      {children}
+      {editing ? (
+        <Button
+          size="sm"
+          variant="secondary"
+          className="absolute right-2 top-2 h-7 gap-1 text-xs"
+          onClick={() => onToggle(id)}
+          aria-label={`${WIDGET_LABEL[id]} ${hidden ? "tonen" : "verbergen"}`}
+        >
+          {hidden ? <Eye className="h-3.5 w-3.5" /> : <EyeOff className="h-3.5 w-3.5" />}
+          {hidden ? "Tonen" : "Verbergen"}
+        </Button>
+      ) : null}
+    </div>
   );
 }
 
@@ -251,6 +440,8 @@ export function CommandCenter() {
   const { user } = useAuth();
   const loadCenter = useServerFn(getCommandCenter);
   const state = useLocalFirst<CommandCenterData>(user ? `cockpit:${user.id}` : null, () => loadCenter());
+  const [isEditingDashboard, setIsEditingDashboard] = useState(false);
+  const layout = useDashboardLayout(user?.id);
 
   if (!user || (!state.data && state.syncing)) {
     return (
@@ -266,6 +457,14 @@ export function CommandCenter() {
 
   const c = state.data;
   const inboxCount = c ? (c.unreadNotifications ?? 0) + (c.openQuestions ?? 0) : null;
+  const showRelays = (c?.activeRelays ?? 0) > 0;
+  const pulse = [
+    ...(!showRelays ? [{ label: `Relays: ${c?.activeRelays ?? 0}`, to: "/dashboard/identity" }] : []),
+    ...(!inboxCount ? [{ label: "Inbox: 0", to: "/dashboard/assets" }] : []),
+    ...(!c?.guestbook30d ? [{ label: "Prikbord: 0", to: "/dashboard/bluesky" }] : []),
+    ...(!c?.upcomingBookings ? [{ label: "Agenda: 0", to: "/agenda" }] : []),
+  ];
+  const slot = (id: WidgetId) => ({ editing: isEditingDashboard, hidden: layout.hidden.includes(id), onToggle: layout.toggle });
 
   return (
     <AppLayout
@@ -275,6 +474,9 @@ export function CommandCenter() {
       crumbs={[{ label: "Command Center" }]}
       actions={
         <div className="flex flex-wrap gap-2">
+          <Button size="sm" variant={isEditingDashboard ? "secondary" : "ghost"} className="gap-1.5" onClick={() => setIsEditingDashboard((v) => !v)} aria-pressed={isEditingDashboard}>
+            <SlidersHorizontal className="h-4 w-4" /> {isEditingDashboard ? "Klaar" : "Aanpassen"}
+          </Button>
           <Button size="sm" variant="ghost" className="gap-1.5" onClick={() => void state.refresh()} disabled={state.syncing}>
             <RefreshCw className={cn("h-4 w-4", state.syncing && "animate-spin")} /> Sync
           </Button>
@@ -297,38 +499,52 @@ export function CommandCenter() {
         </p>
       ) : null}
       <div className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_340px]">
-        <div className="grid auto-rows-min gap-4 sm:grid-cols-2 xl:grid-cols-3">
-          <RelayWidget userId={user.id} connectedApps={c?.connectedApps ?? null} />
+        <div className="grid auto-rows-min grid-flow-dense gap-4 sm:grid-cols-2 xl:grid-cols-3">
+          <SystemPulse items={pulse} />
 
-          <Widget to="/studio" icon={LayoutTemplate} eyebrow="Profiel Hub" title="Hub beheren" hint="Blokken, thema en zichtbaarheid in de Studio." />
+          {showRelays ? (
+            <Slot id="relays" className="sm:col-span-2" {...slot("relays")}>
+              <RelayWidget userId={user.id} connectedApps={c?.connectedApps ?? null} />
+            </Slot>
+          ) : null}
 
-          <Widget icon={QrCode} eyebrow="Snelle QR" title="Plak een link" hint="Direct naar de generator in de Studio.">
-            <QuickQr />
-          </Widget>
+          <Slot id="qr" className="sm:row-span-2" {...slot("qr")}>
+            <Widget icon={QrCode} eyebrow="Snelle QR" title="Plak een link" hint="QR maken, kopiëren of downloaden — hier ter plaatse.">
+              <QuickQr />
+            </Widget>
+          </Slot>
 
-          <Widget
-            to="/dashboard/assets"
-            icon={Inbox}
-            eyebrow="Unified Inbox"
-            title={`${fmt(inboxCount)} nieuwe berichten & Q&A's`}
-            hint={`${fmt(c?.unreadNotifications)} meldingen · ${fmt(c?.openQuestions)} open vragen`}
-          />
+          <Slot id="agenda" className="sm:col-span-2 xl:col-span-1" {...slot("agenda")}>
+            <AgendaWidget c={c} />
+          </Slot>
 
-          <Widget
-            to="/studio/booking"
-            icon={CalendarDays}
-            eyebrow="Agenda & Boekingen"
-            title={c?.upcomingBookings ? `${c.upcomingBookings} aankomend` : "Geen aankomende afspraken"}
-            hint={c?.nextBookingAt ? `Volgende: ${new Date(c.nextBookingAt).toLocaleString("nl-BE")}` : "Deel je boekingspagina vanuit de Studio."}
-          />
+          {inboxCount ? (
+            <Slot id="inbox" {...slot("inbox")}>
+              <Widget
+                to="/dashboard/assets"
+                icon={Inbox}
+                eyebrow="Unified Inbox"
+                title={plural(inboxCount, "nieuw bericht", "nieuwe berichten")}
+                hint={`${plural(c?.unreadNotifications ?? 0, "melding", "meldingen")} · ${plural(c?.openQuestions ?? 0, "open vraag", "open vragen")}`}
+              />
+            </Slot>
+          ) : null}
 
-          <Widget
-            to="/dashboard/bluesky"
-            icon={AtSign}
-            eyebrow="Social & Prikbord"
-            title={`${fmt(c?.guestbook30d)} prikbord-berichten`}
-            hint="Beheer je Mastodon/Bluesky feed op je hub (laatste 30 dagen)."
-          />
+          {c?.guestbook30d ? (
+            <Slot id="social" {...slot("social")}>
+              <Widget
+                to="/dashboard/bluesky"
+                icon={AtSign}
+                eyebrow="Social & Prikbord"
+                title={plural(c.guestbook30d, "prikbord-bericht", "prikbord-berichten")}
+                hint="Laatste 30 dagen · beheer je Mastodon/Bluesky feed op je hub."
+              />
+            </Slot>
+          ) : null}
+
+          <Slot id="hub" {...slot("hub")}>
+            <Widget to="/studio" icon={LayoutTemplate} eyebrow="Profiel Hub" title="Hub beheren" hint="Blokken, thema en zichtbaarheid in de Studio." />
+          </Slot>
         </div>
 
         <ChronosStream events={c?.events ?? []} syncing={state.syncing} />

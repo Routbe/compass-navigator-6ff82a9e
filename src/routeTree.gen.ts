@@ -68,10 +68,12 @@ import { Route as DotwellKnownJwksDotjsonRouteImport } from './routes/[.]well-kn
 import { Route as DotwellKnownOpenapiDotjsonRouteImport } from './routes/[.]well-known.openapi[.]json'
 import { Route as DotwellKnownOpenidConfigurationRouteImport } from './routes/[.]well-known.openid-configuration'
 import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/admin'
+import { Route as AuthenticatedAgendaRouteImport } from './routes/_authenticated/agenda'
 import { Route as AuthenticatedConsoleRouteImport } from './routes/_authenticated/console'
 import { Route as AuthenticatedDomainsRouteImport } from './routes/_authenticated/domains'
 import { Route as AuthenticatedMyDataRouteImport } from './routes/_authenticated/my-data'
 import { Route as AuthenticatedSettingsRouteImport } from './routes/_authenticated/settings'
+import { Route as APublicIdRouteImport } from './routes/a.$publicId'
 import { Route as AboutIndexRouteImport } from './routes/about.index'
 import { Route as AboutBadgesRouteImport } from './routes/about.badges'
 import { Route as AboutBrandRouteImport } from './routes/about.brand'
@@ -271,6 +273,7 @@ import { Route as SupportWorkspaceDeveloperConsoleRouteImport } from './routes/s
 import { Route as SupportWorkspaceMultipleWorkspacesRouteImport } from './routes/support.workspace.multiple-workspaces'
 import { Route as SupportWorkspaceTeamRolesRouteImport } from './routes/support.workspace.team-roles'
 import { Route as UUsernameSlugRouteImport } from './routes/u.$username_.$slug'
+import { Route as UUsernameAgendaRouteImport } from './routes/u.$username_.agenda'
 import { Route as UUsernameDonateRouteImport } from './routes/u.$username_.donate'
 import { Route as UUsernameFeedbackRouteImport } from './routes/u.$username_.feedback'
 import { Route as UUsernameLiveRouteImport } from './routes/u.$username_.live'
@@ -649,6 +652,11 @@ const AuthenticatedAdminRoute = AuthenticatedAdminRouteImport.update({
   path: '/admin',
   getParentRoute: () => AuthenticatedRoute,
 } as any)
+const AuthenticatedAgendaRoute = AuthenticatedAgendaRouteImport.update({
+  id: '/agenda',
+  path: '/agenda',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
 const AuthenticatedConsoleRoute = AuthenticatedConsoleRouteImport.update({
   id: '/console',
   path: '/console',
@@ -668,6 +676,11 @@ const AuthenticatedSettingsRoute = AuthenticatedSettingsRouteImport.update({
   id: '/settings',
   path: '/settings',
   getParentRoute: () => AuthenticatedRoute,
+} as any)
+const APublicIdRoute = APublicIdRouteImport.update({
+  id: '/a/$publicId',
+  path: '/a/$publicId',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const AboutIndexRoute = AboutIndexRouteImport.update({
   id: '/',
@@ -1714,6 +1727,11 @@ const UUsernameSlugRoute = UUsernameSlugRouteImport.update({
   path: '/u/$username/$slug',
   getParentRoute: () => rootRouteImport,
 } as any)
+const UUsernameAgendaRoute = UUsernameAgendaRouteImport.update({
+  id: '/u/$username_/agenda',
+  path: '/u/$username/agenda',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const UUsernameDonateRoute = UUsernameDonateRouteImport.update({
   id: '/u/$username_/donate',
   path: '/u/$username/donate',
@@ -2233,10 +2251,12 @@ export interface FileRoutesByFullPath {
   '/.well-known/openapi.json': typeof DotwellKnownOpenapiDotjsonRoute
   '/.well-known/openid-configuration': typeof DotwellKnownOpenidConfigurationRoute
   '/admin': typeof AuthenticatedAdminRouteWithChildren
+  '/agenda': typeof AuthenticatedAgendaRoute
   '/console': typeof AuthenticatedConsoleRouteWithChildren
   '/domains': typeof AuthenticatedDomainsRoute
   '/my-data': typeof AuthenticatedMyDataRoute
   '/settings': typeof AuthenticatedSettingsRoute
+  '/a/$publicId': typeof APublicIdRoute
   '/about/badges': typeof AboutBadgesRoute
   '/about/brand': typeof AboutBrandRoute
   '/about/custom-badges': typeof AboutCustomBadgesRoute
@@ -2432,6 +2452,7 @@ export interface FileRoutesByFullPath {
   '/support/workspace/multiple-workspaces': typeof SupportWorkspaceMultipleWorkspacesRoute
   '/support/workspace/team-roles': typeof SupportWorkspaceTeamRolesRoute
   '/u/$username/$slug': typeof UUsernameSlugRoute
+  '/u/$username/agenda': typeof UUsernameAgendaRoute
   '/u/$username/donate': typeof UUsernameDonateRoute
   '/u/$username/feedback': typeof UUsernameFeedbackRoute
   '/u/$username/live': typeof UUsernameLiveRoute
@@ -2564,9 +2585,11 @@ export interface FileRoutesByTo {
   '/.well-known/jwks.json': typeof DotwellKnownJwksDotjsonRoute
   '/.well-known/openapi.json': typeof DotwellKnownOpenapiDotjsonRoute
   '/.well-known/openid-configuration': typeof DotwellKnownOpenidConfigurationRoute
+  '/agenda': typeof AuthenticatedAgendaRoute
   '/domains': typeof AuthenticatedDomainsRoute
   '/my-data': typeof AuthenticatedMyDataRoute
   '/settings': typeof AuthenticatedSettingsRoute
+  '/a/$publicId': typeof APublicIdRoute
   '/about/badges': typeof AboutBadgesRoute
   '/about/brand': typeof AboutBrandRoute
   '/about/custom-badges': typeof AboutCustomBadgesRoute
@@ -2760,6 +2783,7 @@ export interface FileRoutesByTo {
   '/support/workspace/multiple-workspaces': typeof SupportWorkspaceMultipleWorkspacesRoute
   '/support/workspace/team-roles': typeof SupportWorkspaceTeamRolesRoute
   '/u/$username/$slug': typeof UUsernameSlugRoute
+  '/u/$username/agenda': typeof UUsernameAgendaRoute
   '/u/$username/donate': typeof UUsernameDonateRoute
   '/u/$username/feedback': typeof UUsernameFeedbackRoute
   '/u/$username/live': typeof UUsernameLiveRoute
@@ -2906,10 +2930,12 @@ export interface FileRoutesById {
   '/.well-known/openapi.json': typeof DotwellKnownOpenapiDotjsonRoute
   '/.well-known/openid-configuration': typeof DotwellKnownOpenidConfigurationRoute
   '/_authenticated/admin': typeof AuthenticatedAdminRouteWithChildren
+  '/_authenticated/agenda': typeof AuthenticatedAgendaRoute
   '/_authenticated/console': typeof AuthenticatedConsoleRouteWithChildren
   '/_authenticated/domains': typeof AuthenticatedDomainsRoute
   '/_authenticated/my-data': typeof AuthenticatedMyDataRoute
   '/_authenticated/settings': typeof AuthenticatedSettingsRoute
+  '/a/$publicId': typeof APublicIdRoute
   '/about/badges': typeof AboutBadgesRoute
   '/about/brand': typeof AboutBrandRoute
   '/about/custom-badges': typeof AboutCustomBadgesRoute
@@ -3105,6 +3131,7 @@ export interface FileRoutesById {
   '/support/workspace/multiple-workspaces': typeof SupportWorkspaceMultipleWorkspacesRoute
   '/support/workspace/team-roles': typeof SupportWorkspaceTeamRolesRoute
   '/u/$username_/$slug': typeof UUsernameSlugRoute
+  '/u/$username_/agenda': typeof UUsernameAgendaRoute
   '/u/$username_/donate': typeof UUsernameDonateRoute
   '/u/$username_/feedback': typeof UUsernameFeedbackRoute
   '/u/$username_/live': typeof UUsernameLiveRoute
@@ -3252,10 +3279,12 @@ export interface FileRouteTypes {
     | '/.well-known/openapi.json'
     | '/.well-known/openid-configuration'
     | '/admin'
+    | '/agenda'
     | '/console'
     | '/domains'
     | '/my-data'
     | '/settings'
+    | '/a/$publicId'
     | '/about/badges'
     | '/about/brand'
     | '/about/custom-badges'
@@ -3451,6 +3480,7 @@ export interface FileRouteTypes {
     | '/support/workspace/multiple-workspaces'
     | '/support/workspace/team-roles'
     | '/u/$username/$slug'
+    | '/u/$username/agenda'
     | '/u/$username/donate'
     | '/u/$username/feedback'
     | '/u/$username/live'
@@ -3583,9 +3613,11 @@ export interface FileRouteTypes {
     | '/.well-known/jwks.json'
     | '/.well-known/openapi.json'
     | '/.well-known/openid-configuration'
+    | '/agenda'
     | '/domains'
     | '/my-data'
     | '/settings'
+    | '/a/$publicId'
     | '/about/badges'
     | '/about/brand'
     | '/about/custom-badges'
@@ -3779,6 +3811,7 @@ export interface FileRouteTypes {
     | '/support/workspace/multiple-workspaces'
     | '/support/workspace/team-roles'
     | '/u/$username/$slug'
+    | '/u/$username/agenda'
     | '/u/$username/donate'
     | '/u/$username/feedback'
     | '/u/$username/live'
@@ -3924,10 +3957,12 @@ export interface FileRouteTypes {
     | '/.well-known/openapi.json'
     | '/.well-known/openid-configuration'
     | '/_authenticated/admin'
+    | '/_authenticated/agenda'
     | '/_authenticated/console'
     | '/_authenticated/domains'
     | '/_authenticated/my-data'
     | '/_authenticated/settings'
+    | '/a/$publicId'
     | '/about/badges'
     | '/about/brand'
     | '/about/custom-badges'
@@ -4123,6 +4158,7 @@ export interface FileRouteTypes {
     | '/support/workspace/multiple-workspaces'
     | '/support/workspace/team-roles'
     | '/u/$username_/$slug'
+    | '/u/$username_/agenda'
     | '/u/$username_/donate'
     | '/u/$username_/feedback'
     | '/u/$username_/live'
@@ -4269,6 +4305,7 @@ export interface RootRouteChildren {
   DotwellKnownJwksDotjsonRoute: typeof DotwellKnownJwksDotjsonRoute
   DotwellKnownOpenapiDotjsonRoute: typeof DotwellKnownOpenapiDotjsonRoute
   DotwellKnownOpenidConfigurationRoute: typeof DotwellKnownOpenidConfigurationRoute
+  APublicIdRoute: typeof APublicIdRoute
   AccountAccountViewRoute: typeof AccountAccountViewRoute
   ApiMcpRoute: typeof ApiMcpRoute
   ApiPaymentStatusRoute: typeof ApiPaymentStatusRoute
@@ -4335,6 +4372,7 @@ export interface RootRouteChildren {
   QrToolsWifiRoute: typeof QrToolsWifiRoute
   RUAliasRoute: typeof RUAliasRoute
   UUsernameSlugRoute: typeof UUsernameSlugRoute
+  UUsernameAgendaRoute: typeof UUsernameAgendaRoute
   UUsernameDonateRoute: typeof UUsernameDonateRoute
   UUsernameFeedbackRoute: typeof UUsernameFeedbackRoute
   UUsernameLiveRoute: typeof UUsernameLiveRoute
@@ -4806,6 +4844,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
+    '/_authenticated/agenda': {
+      id: '/_authenticated/agenda'
+      path: '/agenda'
+      fullPath: '/agenda'
+      preLoaderRoute: typeof AuthenticatedAgendaRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
     '/_authenticated/console': {
       id: '/_authenticated/console'
       path: '/console'
@@ -4833,6 +4878,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/settings'
       preLoaderRoute: typeof AuthenticatedSettingsRouteImport
       parentRoute: typeof AuthenticatedRoute
+    }
+    '/a/$publicId': {
+      id: '/a/$publicId'
+      path: '/a/$publicId'
+      fullPath: '/a/$publicId'
+      preLoaderRoute: typeof APublicIdRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/about/': {
       id: '/about/'
@@ -6227,6 +6279,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof UUsernameSlugRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/u/$username_/agenda': {
+      id: '/u/$username_/agenda'
+      path: '/u/$username/agenda'
+      fullPath: '/u/$username/agenda'
+      preLoaderRoute: typeof UUsernameAgendaRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/u/$username_/donate': {
       id: '/u/$username_/donate'
       path: '/u/$username/donate'
@@ -6929,6 +6988,7 @@ const AuthenticatedConsoleRouteWithChildren =
 
 interface AuthenticatedRouteChildren {
   AuthenticatedAdminRoute: typeof AuthenticatedAdminRouteWithChildren
+  AuthenticatedAgendaRoute: typeof AuthenticatedAgendaRoute
   AuthenticatedConsoleRoute: typeof AuthenticatedConsoleRouteWithChildren
   AuthenticatedDomainsRoute: typeof AuthenticatedDomainsRoute
   AuthenticatedMyDataRoute: typeof AuthenticatedMyDataRoute
@@ -6954,6 +7014,7 @@ interface AuthenticatedRouteChildren {
 
 const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
   AuthenticatedAdminRoute: AuthenticatedAdminRouteWithChildren,
+  AuthenticatedAgendaRoute: AuthenticatedAgendaRoute,
   AuthenticatedConsoleRoute: AuthenticatedConsoleRouteWithChildren,
   AuthenticatedDomainsRoute: AuthenticatedDomainsRoute,
   AuthenticatedMyDataRoute: AuthenticatedMyDataRoute,
@@ -7409,6 +7470,7 @@ const rootRouteChildren: RootRouteChildren = {
   DotwellKnownJwksDotjsonRoute: DotwellKnownJwksDotjsonRoute,
   DotwellKnownOpenapiDotjsonRoute: DotwellKnownOpenapiDotjsonRoute,
   DotwellKnownOpenidConfigurationRoute: DotwellKnownOpenidConfigurationRoute,
+  APublicIdRoute: APublicIdRoute,
   AccountAccountViewRoute: AccountAccountViewRoute,
   ApiMcpRoute: ApiMcpRoute,
   ApiPaymentStatusRoute: ApiPaymentStatusRoute,
@@ -7475,6 +7537,7 @@ const rootRouteChildren: RootRouteChildren = {
   QrToolsWifiRoute: QrToolsWifiRoute,
   RUAliasRoute: RUAliasRoute,
   UUsernameSlugRoute: UUsernameSlugRoute,
+  UUsernameAgendaRoute: UUsernameAgendaRoute,
   UUsernameDonateRoute: UUsernameDonateRoute,
   UUsernameFeedbackRoute: UUsernameFeedbackRoute,
   UUsernameLiveRoute: UUsernameLiveRoute,

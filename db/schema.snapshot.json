@@ -15358,6 +15358,172 @@
     },
     {
       "schema": "public",
+      "name": "rout_calendars",
+      "columns": [
+        {
+          "name": "id",
+          "type": "uuid",
+          "notNull": true,
+          "default": "gen_random_uuid()",
+          "identity": null,
+          "generated": null
+        },
+        {
+          "name": "user_id",
+          "type": "uuid",
+          "notNull": true,
+          "default": null,
+          "identity": null,
+          "generated": null
+        },
+        {
+          "name": "workspace_id",
+          "type": "uuid",
+          "notNull": false,
+          "default": null,
+          "identity": null,
+          "generated": null
+        },
+        {
+          "name": "mode",
+          "type": "text",
+          "notNull": true,
+          "default": "'linked'::text",
+          "identity": null,
+          "generated": null
+        },
+        {
+          "name": "public_id",
+          "type": "text",
+          "notNull": true,
+          "default": null,
+          "identity": null,
+          "generated": null
+        },
+        {
+          "name": "title",
+          "type": "text",
+          "notNull": true,
+          "default": null,
+          "identity": null,
+          "generated": null
+        },
+        {
+          "name": "description",
+          "type": "text",
+          "notNull": false,
+          "default": null,
+          "identity": null,
+          "generated": null
+        },
+        {
+          "name": "event_type_id",
+          "type": "uuid",
+          "notNull": false,
+          "default": null,
+          "identity": null,
+          "generated": null
+        },
+        {
+          "name": "is_active",
+          "type": "boolean",
+          "notNull": true,
+          "default": "true",
+          "identity": null,
+          "generated": null
+        },
+        {
+          "name": "expires_at",
+          "type": "timestamp with time zone",
+          "notNull": false,
+          "default": null,
+          "identity": null,
+          "generated": null
+        },
+        {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "notNull": true,
+          "default": "now()",
+          "identity": null,
+          "generated": null
+        },
+        {
+          "name": "updated_at",
+          "type": "timestamp with time zone",
+          "notNull": true,
+          "default": "now()",
+          "identity": null,
+          "generated": null
+        }
+      ],
+      "constraints": [
+        {
+          "name": "rout_calendars_event_type_id_fkey",
+          "kind": "f",
+          "def": "FOREIGN KEY (event_type_id) REFERENCES booking_event_types(id) ON DELETE SET NULL"
+        },
+        {
+          "name": "rout_calendars_mode_check",
+          "kind": "c",
+          "def": "CHECK ((mode = ANY (ARRAY['linked'::text, 'sovereign'::text])))"
+        },
+        {
+          "name": "rout_calendars_pkey",
+          "kind": "p",
+          "def": "PRIMARY KEY (id)"
+        },
+        {
+          "name": "rout_calendars_public_id_check",
+          "kind": "c",
+          "def": "CHECK ((public_id ~ '^[A-Za-z0-9_-]{12,32}$'::text))"
+        },
+        {
+          "name": "rout_calendars_title_check",
+          "kind": "c",
+          "def": "CHECK (((char_length(title) >= 1) AND (char_length(title) <= 120)))"
+        },
+        {
+          "name": "rout_calendars_user_id_fkey",
+          "kind": "f",
+          "def": "FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE"
+        },
+        {
+          "name": "rout_calendars_workspace_id_fkey",
+          "kind": "f",
+          "def": "FOREIGN KEY (workspace_id) REFERENCES workspaces(id) ON DELETE CASCADE"
+        }
+      ],
+      "indexes": [
+        "CREATE INDEX rout_calendars_user ON public.rout_calendars USING btree (user_id)",
+        "CREATE UNIQUE INDEX rout_calendars_public_id ON public.rout_calendars USING btree (public_id)"
+      ],
+      "triggers": [],
+      "rls": true,
+      "forceRls": false,
+      "policies": [
+        {
+          "name": "rout_owner_all",
+          "permissive": true,
+          "roles": [
+            "public"
+          ],
+          "cmd": "ALL",
+          "using": "(user_id = rout_current_user_id())",
+          "check": "(user_id = rout_current_user_id())"
+        }
+      ],
+      "grants": {
+        "rout_app": [
+          "DELETE",
+          "INSERT",
+          "SELECT",
+          "UPDATE"
+        ]
+      }
+    },
+    {
+      "schema": "public",
       "name": "saved_qrs",
       "columns": [
         {
@@ -22765,6 +22931,12 @@
       "name": "rout_migrated_workspace_for_handle",
       "args": "p_handle text, p_space text",
       "def": "CREATE OR REPLACE FUNCTION public.rout_migrated_workspace_for_handle(p_handle text, p_space text)\n RETURNS text\n LANGUAGE sql\n STABLE SECURITY DEFINER\n SET search_path TO 'public'\nAS $function$\n  select w.slug\n    from public.users u\n    join public.workspaces w on w.id = u.migrated_to_workspace_id\n   where u.account_status = 'migrated_sunset'\n     and u.sunset_at > now()\n     and u.id = case\n       when p_space = 'alias' then (select a.user_id from public.alias_profiles a where lower(a.handle) = lower(p_handle) limit 1)\n       else (select p.id from public.profiles p where lower(p.username) = lower(p_handle) limit 1)\n     end\n   limit 1\n$function$"
+    },
+    {
+      "schema": "public",
+      "name": "rout_public_calendar",
+      "args": "p_public_id text",
+      "def": "CREATE OR REPLACE FUNCTION public.rout_public_calendar(p_public_id text)\n RETURNS TABLE(title text, description text, event_type_id uuid)\n LANGUAGE sql\n STABLE SECURITY DEFINER\n SET search_path TO 'public'\nAS $function$\n  select c.title, c.description, c.event_type_id\n    from public.rout_calendars c\n   where c.public_id = p_public_id\n     and c.is_active\n     and (c.expires_at is null or c.expires_at > now())\n   limit 1\n$function$"
     },
     {
       "schema": "public",
