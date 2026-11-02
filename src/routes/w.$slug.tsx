@@ -3,6 +3,7 @@ import { getPublicWorkspace } from "@/lib/workspace-public.functions";
 import { seedWorkspaceStudio, workspaceProfileRecord } from "@/lib/workspace-studio";
 import { ProfileView } from "@/components/profile/ProfileView";
 import { workspacePublicPath } from "@/lib/workspace-rules";
+import { jsonLdScript } from "@/lib/social-meta";
 
 export const Route = createFileRoute("/w/$slug")({
   loader: async ({ params }) => {
@@ -31,6 +32,16 @@ export const Route = createFileRoute("/w/$slug")({
       ],
       // rel="me" lets Mastodon show the blue check for this page.
       links: (loaderData?.relMe ?? []).map((href) => ({ rel: "me", href })),
+      scripts: loaderData
+        ? jsonLdScript({
+            "@context": "https://schema.org",
+            "@type": "Organization",
+            name: loaderData.name,
+            url: `https://rout.be/w/${loaderData.slug}`,
+            description,
+            ...(loaderData.relMe?.length ? { sameAs: loaderData.relMe } : {}),
+          })
+        : [],
     };
   },
   component: WorkspacePage,

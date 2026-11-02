@@ -91,7 +91,7 @@ export function Footer() {
 
   return (
     <footer className="mt-auto border-t border-border bg-background">
-      <div className="container mx-auto px-4 py-8 pb-[calc(2rem+env(safe-area-inset-bottom))] md:py-12">
+      <div className="container mx-auto px-4 py-6 pb-[calc(1.25rem+env(safe-area-inset-bottom))] md:py-8">
         <div className="min-w-0 space-y-3">
           {/* Altijd naar de root van de huidige omgeving — nooit een preview-host. */}
           <Link to="/" aria-label="ROUT home" className="inline-flex">
@@ -118,7 +118,7 @@ export function Footer() {
           </div>
         </div>
 
-        <div className="mt-10 grid grid-cols-2 gap-8 sm:gap-12 md:grid-cols-4">
+        <div className="mt-6 grid grid-cols-2 gap-x-6 gap-y-5 sm:gap-8 md:grid-cols-4">
           <nav className="space-y-3">
             <p className={headingClass}>Platform</p>
             <ul className="space-y-1.5">
@@ -185,7 +185,7 @@ export function Footer() {
           </nav>
         </div>
 
-        <div className="mt-10 flex flex-col items-center gap-2 border-t border-border/40 pt-5 text-center text-xs text-muted-foreground">
+        <div className="mt-6 flex flex-col items-center gap-2 border-t border-border/40 pt-4 text-center text-xs text-muted-foreground">
           <p>
             <span>© 2026 ROUT</span>{" "}
             · Open Source (AGPLv3) · Designed &amp; engineered by{" "}
