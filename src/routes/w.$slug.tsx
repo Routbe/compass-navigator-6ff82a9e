@@ -2,6 +2,7 @@ import { createFileRoute, notFound } from "@tanstack/react-router";
 import { getPublicWorkspace } from "@/lib/workspace-public.functions";
 import { seedWorkspaceStudio, workspaceProfileRecord } from "@/lib/workspace-studio";
 import { ProfileView } from "@/components/profile/ProfileView";
+import { workspacePublicPath } from "@/lib/workspace-rules";
 
 export const Route = createFileRoute("/w/$slug")({
   loader: async ({ params }) => {
@@ -43,7 +44,7 @@ function WorkspacePage() {
   if (!ws.studio && !payload.tagline && ws.description) payload.tagline = ws.description.slice(0, 240);
   return (
     <main className="min-h-screen bg-background">
-      <ProfileView profile={workspaceProfileRecord(ws.slug, payload)} free={!ws.domainVerified} />
+      <ProfileView profile={workspaceProfileRecord(ws.slug, payload)} free={!ws.domainVerified} publicPath={workspacePublicPath(ws.slug, { name: ws.domain, verified: ws.domainVerified })} />
     </main>
   );
 }

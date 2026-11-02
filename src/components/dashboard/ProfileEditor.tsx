@@ -141,6 +141,8 @@ import {
 } from "@/lib/alias-profile.functions";
 import { SubdomainPanel } from "@/components/dashboard/SubdomainPanel";
 import { WorkspaceDomainPanel } from "@/components/dashboard/WorkspaceDomainPanel";
+import { WorkspaceAddressCard } from "@/components/workspace/WorkspaceAddressCard";
+import { workspacePublicPath } from "@/lib/workspace-rules";
 import { BadgesPanel } from "@/components/dashboard/BadgesPanel";
 import { BadgeActivityPanel } from "@/components/dashboard/BadgeActivityPanel";
 import { EmailForwardingPanel } from "@/components/dashboard/EmailForwardingPanel";
@@ -212,6 +214,11 @@ export function ProfileEditor({ variant = "verified", pageMode = "profile", onPa
       : discardPersonal(args);
   const loadAnalytics = useServerFn(getStudioAnalytics);
   const [tab, setTab] = useState<StudioTab>("links");
+  // Deep link (?tab=identity) from workspace Settings straight to a tab.
+  useEffect(() => {
+    const want = new URLSearchParams(window.location.search).get("tab");
+    if (want && TABS.some((t) => t.id === want)) setTab(want as StudioTab);
+  }, []);
   /** Studio-modus: het profiel zelf of de steunpagina (rout.be/<handle>/tip). */
   const editMode = pageMode;
   const [tipEnabled, setTipEnabled] = useState(false);
@@ -449,7 +456,7 @@ export function ProfileEditor({ variant = "verified", pageMode = "profile", onPa
   // deze blokkeren het opslaan volledig.
   const strictIssue = strictHandleIssue(handle, { alias });
   const handleProblem = normalized ? handleIssue(normalized, handleCtx) : null;
-  // Een workspace-username is de vaste slug (beheerd in Instellingen), dus de
+  // Een workspace-username is de vaste slug (beheerd op Identiteit), dus de
   // persoonlijke handle-regels mogen het opslaan daar nooit blokkeren — anders
   // bleef "Wijzigingen opslaan…" eindeloos draaien.
   const handleOk = isWorkspace || (isValidHandle(normalized) && !reserved && !handleProblem && !strictIssue);
@@ -482,9 +489,7 @@ export function ProfileEditor({ variant = "verified", pageMode = "profile", onPa
   // Workspace-URL: het geverifieerde bedrijfsdomein (rout.be/<domein>) wint,
   // anders de vaste workspace-slug. Één bron van waarheid, nooit lokale state.
   const publicPath = isWorkspace
-    ? wsDomain?.verified
-      ? `/${wsDomain.name}`
-      : `/w/${wsCanvas?.slug ?? workspaceSlug ?? ""}`
+    ? workspacePublicPath(wsCanvas?.slug ?? workspaceSlug ?? "", wsDomain)
     : (live.path ?? styledProfilePath(claimed ?? "", urlStyle));
   useEffect(() => { onPagesChange?.({ tipEnabled: !alias && verified && tipEnabled, handle: normalized }); }, [alias, verified, tipEnabled, normalized, onPagesChange]);
 
@@ -1568,6 +1573,7 @@ export function ProfileEditor({ variant = "verified", pageMode = "profile", onPa
                 </AccordionContent>
               </AccordionItem>
 
+              {!isWorkspace && (<>
               <AccordionItem
                 value="identity_badges"
                 className="rounded-2xl border border-border bg-card px-4 sm:px-5"
@@ -1960,6 +1966,7 @@ export function ProfileEditor({ variant = "verified", pageMode = "profile", onPa
                   </section>
                 </AccordionContent>
               </AccordionItem>
+              </>)}
 
               {/* Steunpagina: enkel voor geverifieerde leden met een root-handle (server-side afgedwongen). */}
               <AccordionItem
@@ -1980,13 +1987,53 @@ export function ProfileEditor({ variant = "verified", pageMode = "profile", onPa
           {tab === "identity" && (
             isWorkspace ? (
               <div className="space-y-4">
-              {/* Workspace-verificatie = het bedrijfsdomein; sociale claims eronder. */}
-              <WorkspaceDomainPanel
-                workspaceId={wsCanvas?.workspaceId ?? ""}
-                onVerified={() => setLoadAttempt((n) => n + 1)}
-              />
-              <WorkspaceBlueskyPanel workspaceId={wsCanvas?.workspaceId ?? ""} />
-              <WorkspaceSocialPanel workspaceId={wsCanvas?.workspaceId ?? ""} />
+                {/* 1 — Waar de workspace woont: username, eigen domein, live adres. */}
+                <section className="space-y-4 rounded-2xl border border-border bg-card p-4 sm:p-5">
+                  <div>
+                    <h2 className="text-lg font-medium">Sovereign Address &amp; Domain</h2>
+                    <p className="mt-1 text-xs text-muted-foreground">Je ROUT-username en eigen bedrijfsdomein bepalen waar deze workspace live staat.</p>
+                  </div>
+                  <WorkspaceAddressCard workspaceId={wsCanvas?.workspaceId ?? ""} />
+                  <div id="workspace-domain">
+                    <WorkspaceDomainPanel
+                      workspaceId={wsCanvas?.workspaceId ?? ""}
+                      onVerified={() => setLoadAttempt((n) => n + 1)}
+                    />
+                  </div>
+                </section>
+
+                {/* 2 — Decentrale identiteiten: Bluesky, Mastodon rel="me", GitHub. */}
+                <section className="space-y-4 rounded-2xl border border-border bg-card p-4 sm:p-5">
+                  <div>
+                    <h2 className="text-lg font-medium">Decentrale identiteiten &amp; socials</h2>
+                    <p className="mt-1 text-xs text-muted-foreground">Bluesky-handle, Mastodon-verificatie en GitHub- of andere openbare profielen.</p>
+                  </div>
+                  <WorkspaceBlueskyPanel workspaceId={wsCanvas?.workspaceId ?? ""} />
+                  <WorkspaceSocialPanel workspaceId={wsCanvas?.workspaceId ?? ""} />
+                </section>
+
+                {/* 3 — Verificatie & badges. */}
+                <section className="space-y-3 rounded-2xl border border-border bg-card p-4 sm:p-5">
+                  <h2 className="text-lg font-medium">Verificatie &amp; badges</h2>
+                  <ul className="divide-y divide-border rounded-xl border border-border text-sm">
+                    <li className="flex items-center justify-between gap-3 px-3 py-2.5">
+                      <span>Bedrijfsdomein</span>
+                      <span className={verified ? "font-medium text-foreground" : "text-muted-foreground"}>
+                        {wsDomain?.verified ? `Geverifieerd · ${wsDomain.name}` : wsDomain ? "Wacht op DNS-controle" : "Niet gekoppeld"}
+                      </span>
+                    </li>
+                    <li className="flex items-center justify-between gap-3 px-3 py-2.5">
+                      <span>ROUT-organisatiebadge</span>
+                      <span className={verified ? "rounded-full border border-primary/40 bg-primary/10 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-primary" : "text-muted-foreground"}>
+                        {verified ? "Geverifieerd bedrijf" : "Nog niet"}
+                      </span>
+                    </li>
+                    <li className="flex items-center justify-between gap-3 px-3 py-2.5">
+                      <span>eID &amp; passkeys (je eigen account)</span>
+                      <a href="/settings" className="text-xs font-medium underline-offset-4 hover:underline">Beheren</a>
+                    </li>
+                  </ul>
+                </section>
               </div>
             ) : !verified ? (
               <div className="rounded-2xl border border-border bg-card p-4 sm:p-5">
@@ -2035,7 +2082,7 @@ export function ProfileEditor({ variant = "verified", pageMode = "profile", onPa
 
         {/* Live preview — desktop: volledig stationair naast de editor terwijl
             de formulieren links scrollen (z-10 < vaste header z-50) */}
-        <ProfileHeaderPreview previewDraft={previewDraft} free={previewFree} />
+        <ProfileHeaderPreview previewDraft={previewDraft} free={previewFree} publicPath={isWorkspace ? publicPath : undefined} />
       </div>
       </>
       )}
@@ -2139,7 +2186,7 @@ export function ProfileEditor({ variant = "verified", pageMode = "profile", onPa
               <div className="relative overflow-hidden rounded-[2rem] bg-background">
                 <span className="absolute left-1/2 top-2 z-10 h-1.5 w-16 -translate-x-1/2 rounded-full bg-foreground/25" />
                 <div className="scrollbar-slim aspect-[9/19.5] overflow-y-auto text-foreground">
-                  <ProfileView profile={previewDraft} free={previewFree} />
+                  <ProfileView profile={previewDraft} free={previewFree} publicPath={isWorkspace ? publicPath : undefined} />
                 </div>
               </div>
             </div>

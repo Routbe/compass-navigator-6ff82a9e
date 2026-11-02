@@ -15,13 +15,15 @@ interface ProfileHeaderPreviewProps {
    * zodat de preview 1:1 matcht met wat bezoekers zien (badge, URL, namespace).
    */
   free: boolean;
+  /** Workspace canvases pass "/w/<slug>" (or the verified domain) here. */
+  publicPath?: string;
 }
 
 /**
  * Live preview van het profiel: telefoonmockup of desktopvenster, blijft
  * stationair naast de editor terwijl de formulieren links scrollen.
  */
-export function ProfileHeaderPreview({ previewDraft, free }: ProfileHeaderPreviewProps) {
+export function ProfileHeaderPreview({ previewDraft, free, publicPath }: ProfileHeaderPreviewProps) {
   /** Live view: realistisch telefoonframe of breed desktopvenster. */
   const [previewDevice, setPreviewDevice] = useState<"mobile" | "desktop">("mobile");
   /** Desktopscherm: werkelijke containerbreedte → schaalfactor voor het 1280px-virtuele viewport. */
@@ -93,7 +95,7 @@ export function ProfileHeaderPreview({ previewDraft, free }: ProfileHeaderPrevie
                   {/* `zoom` (i.p.v. transform) schaalt óók de layouthoogte, zodat
                       het scrollen in het frame precies klopt. */}
                   <div style={{ width: PHONE_VIEWPORT, zoom: PHONE_SCALE }}>
-                    <ProfileView profile={previewDraft} free={free} />
+                    <ProfileView profile={previewDraft} free={free} publicPath={publicPath} />
                   </div>
                 </div>
               </div>
@@ -118,7 +120,7 @@ export function ProfileHeaderPreview({ previewDraft, free }: ProfileHeaderPrevie
                     className="h-[800px] w-[1280px] origin-top-left"
                     style={{ transform: `scale(${laptopScale})` }}
                   >
-                    <ProfileView profile={previewDraft} free={free} layout="wide" />
+                    <ProfileView profile={previewDraft} free={free} publicPath={publicPath} layout="wide" />
                   </div>
                   {/* Diagonale glasglans over het scherm */}
                   <div
