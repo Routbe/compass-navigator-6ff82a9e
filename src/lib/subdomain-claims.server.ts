@@ -201,7 +201,7 @@ export async function resendClaimMails(claimId: string): Promise<{
       to: [{ email: adminEmail }],
       params: {
         requested_subdomain: escapeMailParam(subdomain),
-        cname_source: escapeMailParam(subdomain.replace(/\.rout\.be$/), ""),
+        cname_source: escapeMailParam(subdomain.replace(/\.rout\.be$/, "")),
         user_name: escapeMailParam(userName),
         user_email: escapeMailParam(email ?? ""),
       },

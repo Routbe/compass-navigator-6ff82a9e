@@ -242,7 +242,7 @@ export const Route = createFileRoute("/api/claim-root")({
         return Response.json({
           success: true,
           admin_email: adminMail.status,
-          user_email: escapeMailParam(userMail.status),
+          user_email: userMail.status,
           admin_mail_error: adminMail.error,
           user_mail_error: userMail.error,
           subdomain: requestedSubdomain,
