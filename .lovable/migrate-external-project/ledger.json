@@ -129,10 +129,10 @@
     },
     {
       "capability": "verification",
-      "source": "vitest suite (src/test, *.test.ts) and tsgo typecheck",
-      "outcome": "build, typecheck and unit tests run in this project",
-      "status": "in_progress",
-      "next_action": "Run the suite; live business flows stay blocked until a database is connected."
+      "source": "vitest suite (270 files) + managed preview build",
+      "outcome": "1522 of 1524 tests pass; public pages, sign-in screen, QR generator and docs all render in the preview",
+      "status": "partially verified",
+      "next_action": "Two failures are pre-existing schema drift in the imported repository (db/ has two scripts numbered 0169, and db/schema.snapshot.json predates them); reconcile with the live database before applying the schema. Live business flows stay blocked until a database is connected."
     }
   ]
 }
