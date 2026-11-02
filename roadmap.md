@@ -28,3 +28,9 @@
 - [x] Neon connection linked
 - [x] Studio "Wijzigingen opslaan…" spins forever — fix
 - [x] Workspace username: editable chosen part (4-char suffix fixed) + use verified domain as username button
+
+## Nov 2 (14:52) request
+- [ ] Mastodon form: username + server fields, prefilled, rel="me" snippet, copy buttons for user.rout.be / rout.be/user (choose one or both)
+- [ ] GitHub website verification guidance (same addresses)
+- [ ] Workspace Studio Bluesky block (username.w.rout.be / domain.rout.be)
+- [ ] DNS: *.w.rout.be wildcard + per-name certificates for domain.rout.be — user's DNS/hosting action
