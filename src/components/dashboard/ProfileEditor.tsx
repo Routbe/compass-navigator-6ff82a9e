@@ -448,7 +448,10 @@ export function ProfileEditor({ variant = "verified", pageMode = "profile", onPa
   // deze blokkeren het opslaan volledig.
   const strictIssue = strictHandleIssue(handle, { alias });
   const handleProblem = normalized ? handleIssue(normalized, handleCtx) : null;
-  const handleOk = isValidHandle(normalized) && !reserved && !handleProblem && !strictIssue;
+  // Een workspace-username is de vaste slug (beheerd in Instellingen), dus de
+  // persoonlijke handle-regels mogen het opslaan daar nooit blokkeren — anders
+  // bleef "Wijzigingen opslaan…" eindeloos draaien.
+  const handleOk = isWorkspace || (isValidHandle(normalized) && !reserved && !handleProblem && !strictIssue);
   /** Een reeds opgeslagen handle die niet meer aan de richtlijnen voldoet. */
   const storedHandleInvalid = claimed ? strictHandleIssue(claimed, { alias }) : null;
   // Volg de actieve identiteitsruimte; schone root-URLs blijven Pro-only.
@@ -2055,6 +2058,8 @@ export function ProfileEditor({ variant = "verified", pageMode = "profile", onPa
             <button type="button" onClick={() => setErrorOpen(true)} className="text-destructive underline">
               {t("studio.editor.notSaved")}
             </button>
+          ) : dirty && !saving && !handleOk ? (
+            <span className="text-destructive">{t("studio.editor.notSaved")}{handleProblem || strictIssue ? ` — ${handleProblem ?? strictIssue}` : ""}</span>
           ) : saving || dirty ? (
             <>
               <Loader2 className="h-3 w-3 animate-spin" aria-hidden /> {t("studio.editor.saving")}
@@ -2085,6 +2090,8 @@ export function ProfileEditor({ variant = "verified", pageMode = "profile", onPa
                 <>
                   <Loader2 className="h-3 w-3 shrink-0 animate-spin" aria-hidden /> {t("studio.editor.saving")}
                 </>
+              ) : dirty && !handleOk ? (
+                <span className="truncate text-destructive">{t("studio.editor.notSaved")}{handleProblem || strictIssue ? ` — ${handleProblem ?? strictIssue}` : ""}</span>
               ) : dirty ? (
                 <>
                   <Loader2 className="h-3 w-3 shrink-0 animate-spin" aria-hidden /> {t("studio.editor.changesSaving")}

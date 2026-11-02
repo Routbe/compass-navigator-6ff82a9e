@@ -175,3 +175,16 @@ export function parseInviteTarget(raw: string): InviteTarget | null {
 export function inviteTargetLabel(t: InviteTarget): string {
   return t.kind === "username" ? `@${t.value}` : t.value;
 }
+
+/**
+ * Free workspaces may rename the part of their slug they chose; the 4-char
+ * suffix stays. Returns the new slug, or an error message.
+ */
+export function slugWithKeptSuffix(currentSlug: string, base: string): { slug: string } | { error: string } {
+  const suffix = /-([a-z0-9]{4})$/.exec(currentSlug)?.[1];
+  const clean = slugify(base).replace(/^-+|-+$/g, "");
+  if (clean.length < 3) return { error: "Kies minstens 3 tekens (letters, cijfers of streepjes)." };
+  const slug = suffix ? `${clean.slice(0, 35)}-${suffix}` : clean.slice(0, 40);
+  if (!isValidWorkspaceSlug(slug)) return { error: "Deze naam is niet toegestaan of gereserveerd." };
+  return { slug };
+}
