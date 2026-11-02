@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "@tanstack/react-router";
-import { AtSign, Building2, Code2, Compass, KeyRound, LayoutDashboard, QrCode, Settings, Sparkles } from "lucide-react";
+import { AtSign, Building2, CalendarDays, Code2, Compass, KeyRound, LayoutDashboard, QrCode, Settings, Sparkles } from "lucide-react";
 import {
   CommandDialog,
   CommandEmpty,
@@ -15,6 +15,7 @@ import { parseOmniInput } from "@/lib/omni-parser";
 const ITEMS = [
   { group: "Navigatie", label: "Studio", to: "/studio", Icon: Sparkles, keywords: "profiel ontwerp" },
   { group: "Navigatie", label: "Dashboard", to: "/dashboard", Icon: LayoutDashboard, keywords: "cockpit beheer" },
+  { group: "Navigatie", label: "Agenda & Boekingen", to: "/agenda", Icon: CalendarDays, keywords: "afspraak boeking kalender" },
   { group: "Navigatie", label: "Workspaces wisselen", to: "/dashboard", Icon: Building2, keywords: "team workspace" },
   { group: "Navigatie", label: "Profielen verkennen", to: "/explore", Icon: Compass, keywords: "zoeken" },
   { group: "Acties", label: "QR-code genereren", to: "/qr-code-generator", Icon: QrCode, keywords: "qr" },

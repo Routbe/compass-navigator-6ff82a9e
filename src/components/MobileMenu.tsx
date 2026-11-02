@@ -24,6 +24,7 @@ const itemClass =
 const TOOLS = [
   { to: "/qr", label: "QR Generator", hint: "menu.generator.hint", icon: QrCode },
   { to: "/studio", label: "Profile Hub Studio", hint: "menu.studio.hint", icon: Palette },
+  { to: "/agenda", label: "Agenda & Boekingen", hint: "menu.agenda.hint", icon: CalendarDays },
   { to: "/batch", label: "Batch Engine", hint: "menu.batch.hint", icon: Layers },
   {
     to: "/dashboard/routes",
