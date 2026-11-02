@@ -5,10 +5,10 @@
 - [x] Merge the library list, keeping this project's framework versions.
 - [x] Check the preview: landing page, about/docs, sign-in screen and QR generator render.
 - [x] Run the app's own test suite: 1522 of 1524 pass.
-- [ ] Choose where the data lives: the original database, or Lovable Cloud.
-- [ ] Import accounts and existing records — needs the user export (emails + original IDs) and the application-table exports.
+- [x] Data stays in the user's own Neon database (chosen 2 Nov); the Neon connection still has to be linked so the app can reach it.
+- [ ] Verify accounts and existing records read back correctly once the Neon connection is linked — no export needed, the data stays in Neon.
 - [ ] Supply service keys (payments, mail, storage, sign-in providers, cron) through the secure form and verify each flow.
-- [ ] Reconcile the two pre-existing database-script failures: duplicate script number 0169 and an out-of-date schema snapshot.
+- [x] Duplicate script number 0169 resolved (the workspace-icon script moved to 0172), the offline schema record rebuilt, and agent_audit_logs added to the account-merge rules as append-only. All 1524 checks pass.
 
 
 - [x] Import ROUT source, styles, assets and dependencies without replacing project identity.
