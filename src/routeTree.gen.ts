@@ -35,6 +35,8 @@ import { Route as HubRouteImport } from './routes/hub'
 import { Route as IbanQrRouteImport } from './routes/iban-qr'
 import { Route as InfoRouteImport } from './routes/info'
 import { Route as LeavingRouteImport } from './routes/leaving'
+import { Route as LlmsFullDottxtRouteImport } from './routes/llms-full[.]txt'
+import { Route as LlmsDottxtRouteImport } from './routes/llms[.]txt'
 import { Route as ManifestoRouteImport } from './routes/manifesto'
 import { Route as OnboardingRouteImport } from './routes/onboarding'
 import { Route as PressRouteImport } from './routes/press'
@@ -42,6 +44,7 @@ import { Route as PrivacyRouteImport } from './routes/privacy'
 import { Route as ProductRouteImport } from './routes/product'
 import { Route as QrRouteImport } from './routes/qr'
 import { Route as QrCodeGeneratorRouteImport } from './routes/qr-code-generator'
+import { Route as RobotsDottxtRouteImport } from './routes/robots[.]txt'
 import { Route as SafetyRouteImport } from './routes/safety'
 import { Route as SecurityRouteImport } from './routes/security'
 import { Route as SelfHostingRouteImport } from './routes/self-hosting'
@@ -238,6 +241,8 @@ import { Route as ApiV1PresenceRouteImport } from './routes/api_.v1.presence'
 import { Route as ApiYoutubeStartRouteImport } from './routes/api_.youtube.start'
 import { Route as AuthMastodonCallbackRouteImport } from './routes/auth_.mastodon.callback'
 import { Route as ClaimWorkspaceTokenRouteImport } from './routes/claim_.workspace.$token'
+import { Route as ParentControlTokenRouteImport } from './routes/parent.control.$token'
+import { Route as PayAuthTokenRouteImport } from './routes/pay.auth.$token'
 import { Route as QrCodeGeneratorContactEmailRouteImport } from './routes/qr-code-generator.contact.email'
 import { Route as QrCodeGeneratorContactSmsRouteImport } from './routes/qr-code-generator.contact.sms'
 import { Route as QrCodeGeneratorContactVcardRouteImport } from './routes/qr-code-generator.contact.vcard'
@@ -489,6 +494,16 @@ const LeavingRoute = LeavingRouteImport.update({
   path: '/leaving',
   getParentRoute: () => rootRouteImport,
 } as any)
+const LlmsFullDottxtRoute = LlmsFullDottxtRouteImport.update({
+  id: '/llms-full.txt',
+  path: '/llms-full.txt',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LlmsDottxtRoute = LlmsDottxtRouteImport.update({
+  id: '/llms.txt',
+  path: '/llms.txt',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ManifestoRoute = ManifestoRouteImport.update({
   id: '/manifesto',
   path: '/manifesto',
@@ -522,6 +537,11 @@ const QrRoute = QrRouteImport.update({
 const QrCodeGeneratorRoute = QrCodeGeneratorRouteImport.update({
   id: '/qr-code-generator',
   path: '/qr-code-generator',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const RobotsDottxtRoute = RobotsDottxtRouteImport.update({
+  id: '/robots.txt',
+  path: '/robots.txt',
   getParentRoute: () => rootRouteImport,
 } as any)
 const SafetyRoute = SafetyRouteImport.update({
@@ -1535,6 +1555,16 @@ const ClaimWorkspaceTokenRoute = ClaimWorkspaceTokenRouteImport.update({
   path: '/claim/workspace/$token',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ParentControlTokenRoute = ParentControlTokenRouteImport.update({
+  id: '/parent/control/$token',
+  path: '/parent/control/$token',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PayAuthTokenRoute = PayAuthTokenRouteImport.update({
+  id: '/pay/auth/$token',
+  path: '/pay/auth/$token',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const QrCodeGeneratorContactEmailRoute =
   QrCodeGeneratorContactEmailRouteImport.update({
     id: '/contact/email',
@@ -2242,6 +2272,8 @@ export interface FileRoutesByFullPath {
   '/iban-qr': typeof IbanQrRoute
   '/info': typeof InfoRouteWithChildren
   '/leaving': typeof LeavingRoute
+  '/llms-full.txt': typeof LlmsFullDottxtRoute
+  '/llms.txt': typeof LlmsDottxtRoute
   '/manifesto': typeof ManifestoRoute
   '/onboarding': typeof OnboardingRoute
   '/press': typeof PressRoute
@@ -2249,6 +2281,7 @@ export interface FileRoutesByFullPath {
   '/product': typeof ProductRouteWithChildren
   '/qr': typeof QrRoute
   '/qr-code-generator': typeof QrCodeGeneratorRouteWithChildren
+  '/robots.txt': typeof RobotsDottxtRoute
   '/safety': typeof SafetyRouteWithChildren
   '/security': typeof SecurityRoute
   '/self-hosting': typeof SelfHostingRoute
@@ -2442,6 +2475,8 @@ export interface FileRoutesByFullPath {
   '/api/youtube/start': typeof ApiYoutubeStartRoute
   '/auth/mastodon/callback': typeof AuthMastodonCallbackRoute
   '/claim/workspace/$token': typeof ClaimWorkspaceTokenRoute
+  '/parent/control/$token': typeof ParentControlTokenRoute
+  '/pay/auth/$token': typeof PayAuthTokenRoute
   '/qr-code-generator/contact/email': typeof QrCodeGeneratorContactEmailRoute
   '/qr-code-generator/contact/sms': typeof QrCodeGeneratorContactSmsRoute
   '/qr-code-generator/contact/vcard': typeof QrCodeGeneratorContactVcardRoute
@@ -2586,11 +2621,14 @@ export interface FileRoutesByTo {
   '/hub': typeof HubRoute
   '/iban-qr': typeof IbanQrRoute
   '/leaving': typeof LeavingRoute
+  '/llms-full.txt': typeof LlmsFullDottxtRoute
+  '/llms.txt': typeof LlmsDottxtRoute
   '/manifesto': typeof ManifestoRoute
   '/onboarding': typeof OnboardingRoute
   '/press': typeof PressRoute
   '/privacy': typeof PrivacyRoute
   '/qr': typeof QrRoute
+  '/robots.txt': typeof RobotsDottxtRoute
   '/security': typeof SecurityRoute
   '/self-hosting': typeof SelfHostingRoute
   '/signature': typeof SignatureRoute
@@ -2777,6 +2815,8 @@ export interface FileRoutesByTo {
   '/api/youtube/start': typeof ApiYoutubeStartRoute
   '/auth/mastodon/callback': typeof AuthMastodonCallbackRoute
   '/claim/workspace/$token': typeof ClaimWorkspaceTokenRoute
+  '/parent/control/$token': typeof ParentControlTokenRoute
+  '/pay/auth/$token': typeof PayAuthTokenRoute
   '/qr-code-generator/contact/email': typeof QrCodeGeneratorContactEmailRoute
   '/qr-code-generator/contact/sms': typeof QrCodeGeneratorContactSmsRoute
   '/qr-code-generator/contact/vcard': typeof QrCodeGeneratorContactVcardRoute
@@ -2929,6 +2969,8 @@ export interface FileRoutesById {
   '/iban-qr': typeof IbanQrRoute
   '/info': typeof InfoRouteWithChildren
   '/leaving': typeof LeavingRoute
+  '/llms-full.txt': typeof LlmsFullDottxtRoute
+  '/llms.txt': typeof LlmsDottxtRoute
   '/manifesto': typeof ManifestoRoute
   '/onboarding': typeof OnboardingRoute
   '/press': typeof PressRoute
@@ -2936,6 +2978,7 @@ export interface FileRoutesById {
   '/product': typeof ProductRouteWithChildren
   '/qr': typeof QrRoute
   '/qr-code-generator': typeof QrCodeGeneratorRouteWithChildren
+  '/robots.txt': typeof RobotsDottxtRoute
   '/safety': typeof SafetyRouteWithChildren
   '/security': typeof SecurityRoute
   '/self-hosting': typeof SelfHostingRoute
@@ -3129,6 +3172,8 @@ export interface FileRoutesById {
   '/api_/youtube/start': typeof ApiYoutubeStartRoute
   '/auth_/mastodon/callback': typeof AuthMastodonCallbackRoute
   '/claim_/workspace/$token': typeof ClaimWorkspaceTokenRoute
+  '/parent/control/$token': typeof ParentControlTokenRoute
+  '/pay/auth/$token': typeof PayAuthTokenRoute
   '/qr-code-generator/contact/email': typeof QrCodeGeneratorContactEmailRoute
   '/qr-code-generator/contact/sms': typeof QrCodeGeneratorContactSmsRoute
   '/qr-code-generator/contact/vcard': typeof QrCodeGeneratorContactVcardRoute
@@ -3282,6 +3327,8 @@ export interface FileRouteTypes {
     | '/iban-qr'
     | '/info'
     | '/leaving'
+    | '/llms-full.txt'
+    | '/llms.txt'
     | '/manifesto'
     | '/onboarding'
     | '/press'
@@ -3289,6 +3336,7 @@ export interface FileRouteTypes {
     | '/product'
     | '/qr'
     | '/qr-code-generator'
+    | '/robots.txt'
     | '/safety'
     | '/security'
     | '/self-hosting'
@@ -3482,6 +3530,8 @@ export interface FileRouteTypes {
     | '/api/youtube/start'
     | '/auth/mastodon/callback'
     | '/claim/workspace/$token'
+    | '/parent/control/$token'
+    | '/pay/auth/$token'
     | '/qr-code-generator/contact/email'
     | '/qr-code-generator/contact/sms'
     | '/qr-code-generator/contact/vcard'
@@ -3626,11 +3676,14 @@ export interface FileRouteTypes {
     | '/hub'
     | '/iban-qr'
     | '/leaving'
+    | '/llms-full.txt'
+    | '/llms.txt'
     | '/manifesto'
     | '/onboarding'
     | '/press'
     | '/privacy'
     | '/qr'
+    | '/robots.txt'
     | '/security'
     | '/self-hosting'
     | '/signature'
@@ -3817,6 +3870,8 @@ export interface FileRouteTypes {
     | '/api/youtube/start'
     | '/auth/mastodon/callback'
     | '/claim/workspace/$token'
+    | '/parent/control/$token'
+    | '/pay/auth/$token'
     | '/qr-code-generator/contact/email'
     | '/qr-code-generator/contact/sms'
     | '/qr-code-generator/contact/vcard'
@@ -3968,6 +4023,8 @@ export interface FileRouteTypes {
     | '/iban-qr'
     | '/info'
     | '/leaving'
+    | '/llms-full.txt'
+    | '/llms.txt'
     | '/manifesto'
     | '/onboarding'
     | '/press'
@@ -3975,6 +4032,7 @@ export interface FileRouteTypes {
     | '/product'
     | '/qr'
     | '/qr-code-generator'
+    | '/robots.txt'
     | '/safety'
     | '/security'
     | '/self-hosting'
@@ -4168,6 +4226,8 @@ export interface FileRouteTypes {
     | '/api_/youtube/start'
     | '/auth_/mastodon/callback'
     | '/claim_/workspace/$token'
+    | '/parent/control/$token'
+    | '/pay/auth/$token'
     | '/qr-code-generator/contact/email'
     | '/qr-code-generator/contact/sms'
     | '/qr-code-generator/contact/vcard'
@@ -4321,6 +4381,8 @@ export interface RootRouteChildren {
   IbanQrRoute: typeof IbanQrRoute
   InfoRoute: typeof InfoRouteWithChildren
   LeavingRoute: typeof LeavingRoute
+  LlmsFullDottxtRoute: typeof LlmsFullDottxtRoute
+  LlmsDottxtRoute: typeof LlmsDottxtRoute
   ManifestoRoute: typeof ManifestoRoute
   OnboardingRoute: typeof OnboardingRoute
   PressRoute: typeof PressRoute
@@ -4328,6 +4390,7 @@ export interface RootRouteChildren {
   ProductRoute: typeof ProductRouteWithChildren
   QrRoute: typeof QrRoute
   QrCodeGeneratorRoute: typeof QrCodeGeneratorRouteWithChildren
+  RobotsDottxtRoute: typeof RobotsDottxtRoute
   SafetyRoute: typeof SafetyRouteWithChildren
   SecurityRoute: typeof SecurityRoute
   SelfHostingRoute: typeof SelfHostingRoute
@@ -4413,6 +4476,8 @@ export interface RootRouteChildren {
   ApiYoutubeStartRoute: typeof ApiYoutubeStartRoute
   AuthMastodonCallbackRoute: typeof AuthMastodonCallbackRoute
   ClaimWorkspaceTokenRoute: typeof ClaimWorkspaceTokenRoute
+  ParentControlTokenRoute: typeof ParentControlTokenRoute
+  PayAuthTokenRoute: typeof PayAuthTokenRoute
   QrContactEmailRoute: typeof QrContactEmailRoute
   QrContactSmsRoute: typeof QrContactSmsRoute
   QrContactVcardRoute: typeof QrContactVcardRoute
@@ -4665,6 +4730,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LeavingRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/llms-full.txt': {
+      id: '/llms-full.txt'
+      path: '/llms-full.txt'
+      fullPath: '/llms-full.txt'
+      preLoaderRoute: typeof LlmsFullDottxtRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/llms.txt': {
+      id: '/llms.txt'
+      path: '/llms.txt'
+      fullPath: '/llms.txt'
+      preLoaderRoute: typeof LlmsDottxtRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/manifesto': {
       id: '/manifesto'
       path: '/manifesto'
@@ -4712,6 +4791,13 @@ declare module '@tanstack/react-router' {
       path: '/qr-code-generator'
       fullPath: '/qr-code-generator'
       preLoaderRoute: typeof QrCodeGeneratorRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/robots.txt': {
+      id: '/robots.txt'
+      path: '/robots.txt'
+      fullPath: '/robots.txt'
+      preLoaderRoute: typeof RobotsDottxtRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/safety': {
@@ -6084,6 +6170,20 @@ declare module '@tanstack/react-router' {
       path: '/claim/workspace/$token'
       fullPath: '/claim/workspace/$token'
       preLoaderRoute: typeof ClaimWorkspaceTokenRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/parent/control/$token': {
+      id: '/parent/control/$token'
+      path: '/parent/control/$token'
+      fullPath: '/parent/control/$token'
+      preLoaderRoute: typeof ParentControlTokenRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/pay/auth/$token': {
+      id: '/pay/auth/$token'
+      path: '/pay/auth/$token'
+      fullPath: '/pay/auth/$token'
+      preLoaderRoute: typeof PayAuthTokenRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/qr-code-generator/contact/email': {
@@ -7518,6 +7618,8 @@ const rootRouteChildren: RootRouteChildren = {
   IbanQrRoute: IbanQrRoute,
   InfoRoute: InfoRouteWithChildren,
   LeavingRoute: LeavingRoute,
+  LlmsFullDottxtRoute: LlmsFullDottxtRoute,
+  LlmsDottxtRoute: LlmsDottxtRoute,
   ManifestoRoute: ManifestoRoute,
   OnboardingRoute: OnboardingRoute,
   PressRoute: PressRoute,
@@ -7525,6 +7627,7 @@ const rootRouteChildren: RootRouteChildren = {
   ProductRoute: ProductRouteWithChildren,
   QrRoute: QrRoute,
   QrCodeGeneratorRoute: QrCodeGeneratorRouteWithChildren,
+  RobotsDottxtRoute: RobotsDottxtRoute,
   SafetyRoute: SafetyRouteWithChildren,
   SecurityRoute: SecurityRoute,
   SelfHostingRoute: SelfHostingRoute,
@@ -7610,6 +7713,8 @@ const rootRouteChildren: RootRouteChildren = {
   ApiYoutubeStartRoute: ApiYoutubeStartRoute,
   AuthMastodonCallbackRoute: AuthMastodonCallbackRoute,
   ClaimWorkspaceTokenRoute: ClaimWorkspaceTokenRoute,
+  ParentControlTokenRoute: ParentControlTokenRoute,
+  PayAuthTokenRoute: PayAuthTokenRoute,
   QrContactEmailRoute: QrContactEmailRoute,
   QrContactSmsRoute: QrContactSmsRoute,
   QrContactVcardRoute: QrContactVcardRoute,

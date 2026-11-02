@@ -1,6 +1,6 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
-import { requireAuth } from "@/lib/auth/middleware";
+import { optionalAuth, requireAuth } from "@/lib/auth/middleware";
 import { ANSWER_MAX, QUESTION_MAX, QUESTION_RATE } from "./questions-rules";
 
 const handle = z.string().trim().regex(/^@?[A-Za-z0-9._-]{1,64}$/).transform((h) => h.replace(/^@/, ""));
@@ -19,9 +19,31 @@ export const getPublishedQuestions = createServerFn({ method: "GET" })
   });
 
 /** Public, no account needed: rate-limited per visitor IP (5/hour). */
+/** Public: who may send a question to this profile (minors default to verified accounts only). */
+export const getQuestionAccess = createServerFn({ method: "GET" })
+  .middleware([optionalAuth])
+  .inputValidator((input: unknown) => z.object({ handle }).parse(input))
+  .handler(async ({ data, context }) => questionAccess(data.handle, context.userId));
+
+async function questionAccess(h: string, userId: string | null) {
+  const { profileQaLevel } = await import("./minor-safety.server");
+  const { canSendQuestion } = await import("./minor-safety");
+  const level = await profileQaLevel(h).catch(() => "public_unrestricted" as const);
+  let verified = false;
+  if (userId && level === "verified_only") {
+    const { sql } = await import("@/lib/neon");
+    const rows = (await sql`select coalesce(verified, false) as v from public.profiles where id = ${userId} limit 1`) as Record<string, unknown>[];
+    verified = rows[0]?.["v"] === true;
+  }
+  return { level, canSend: canSendQuestion(level, { signedIn: Boolean(userId), verified }) };
+}
+
 export const askAnonymousQuestion = createServerFn({ method: "POST" })
+  .middleware([optionalAuth])
   .inputValidator((input: unknown) => z.object({ handle, body: z.string().max(QUESTION_MAX * 2) }).parse(input))
-  .handler(async ({ data }) => {
+  .handler(async ({ data, context }) => {
+    const access = await questionAccess(data.handle, context.userId);
+    if (!access.canSend) return { result: "restricted" as const };
     const { getRequest } = await import("@tanstack/react-start/server");
     const { clientIp, hitRateLimit } = await import("@/lib/rate-limit-db.server");
     const rl = await hitRateLimit("question-ask", clientIp(getRequest()), QUESTION_RATE);
