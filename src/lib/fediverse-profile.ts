@@ -56,3 +56,22 @@ export function assertVerifiedOwner(user: { id: string; emailConfirmedAt: string
   if (!user) throw Object.assign(new Error("Unauthorized"), { statusCode: 401 });
   if (user.id !== ownerId || !user.emailConfirmedAt) throw Object.assign(new Error("Bevestig eerst je e-mailadres."), { statusCode: 403 });
 }
+/** Splits a saved Mastodon URL or @user@server handle into the two form fields. */
+export function splitMastodonHandle(raw: string | null | undefined): { user: string; server: string } {
+  const value = (raw ?? "").trim();
+  const handle = /^@?([a-zA-Z0-9_.-]+)@([a-zA-Z0-9.-]+\.[a-z]{2,})$/i.exec(value);
+  if (handle) return { user: handle[1], server: handle[2].toLowerCase() };
+  try {
+    const url = new URL(value);
+    const user = /^\/@([a-zA-Z0-9_.-]+)\/?$/.exec(url.pathname)?.[1];
+    if (user) return { user, server: url.hostname.toLowerCase() };
+  } catch { /* not a URL */ }
+  return { user: value.replace(/^@/, ""), server: "" };
+}
+
+/** Joins the two form fields into the @user@server handle the save schema accepts. */
+export function joinMastodonHandle(user: string, server: string): string {
+  const u = user.trim().replace(/^@/, "").replace(/@.*$/, "");
+  const s = server.trim().toLowerCase().replace(/^https?:\/\//, "").replace(/\/.*$/, "");
+  return u && s ? `@${u}@${s}` : "";
+}
