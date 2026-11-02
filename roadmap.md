@@ -34,3 +34,11 @@
 - [x] GitHub website verification guidance (same addresses)
 - [x] Workspace Studio Bluesky block (username.w.rout.be / domain.rout.be)
 - [ ] DNS: *.w.rout.be wildcard + per-name certificates for domain.rout.be — blocked: needs the user at their rout.be DNS/hosting provider
+
+## Nov 2 (16:15) request
+- [x] Sign-in / claim / connect screens follow light & dark theme again (forced dark removed)
+- [x] Footer: less white space
+- [x] Sitemap index + static/profiles/workspaces/calendars sub-sitemaps, robots.txt (AI bots + disallows), llms.txt + llms-full.txt, Organization/Service JSON-LD
+- [ ] Live sitemap: rout.be redirects to www.rout.be, so sitemap URLs point at a redirect — blocked: user must make rout.be the primary domain at their host (Vercel)
+- [ ] Review content + design of every about page — not started
+- [ ] Minor protection: date of birth, parental consent mail, /parent/control, parent-gated payments, Q&A levels, DB script — not started (needs DB script approval + mail sending)
