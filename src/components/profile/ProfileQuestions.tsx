@@ -4,7 +4,8 @@ import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { toast } from "sonner";
 import { Loader2, MessageCircleQuestion } from "lucide-react";
-import { askAnonymousQuestion, getPublishedQuestions } from "@/lib/questions.functions";
+import { askAnonymousQuestion, getPublishedQuestions, getQuestionAccess } from "@/lib/questions.functions";
+import { MINOR_QA_NOTICE } from "@/lib/minor-safety";
 import { QUESTION_MAX } from "@/lib/questions-rules";
 
 type Theme = { card: string; border: string; text: string; muted: string };
@@ -12,6 +13,7 @@ type Theme = { card: string; border: string; text: string; muted: string };
 const MESSAGES: Record<string, string> = {
   invalid: "Schrijf een vraag van max 300 tekens.",
   not_found: "Dit profiel neemt geen vragen aan.",
+  restricted: MINOR_QA_NOTICE,
   too_many: "Je hebt het maximum bereikt — probeer het over een uur opnieuw.",
 };
 
@@ -20,6 +22,8 @@ export function ProfileQuestions({ handle, theme }: { handle: string; theme: The
   const { t } = useTranslation();
   const ask = useServerFn(askAnonymousQuestion);
   const q = useQuery({ queryKey: ["questions", handle], queryFn: () => getPublishedQuestions({ data: { handle } }), staleTime: 60_000 });
+  const access = useQuery({ queryKey: ["question-access", handle], queryFn: () => getQuestionAccess({ data: { handle } }), staleTime: 60_000 });
+  const locked = access.data ? !access.data.canSend : false;
   const [body, setBody] = useState("");
   const [busy, setBusy] = useState(false);
   const items = q.data?.questions ?? [];
@@ -45,6 +49,11 @@ export function ProfileQuestions({ handle, theme }: { handle: string; theme: The
     <section className="mt-4 w-full max-w-sm rounded-2xl p-3 text-left" style={{ background: theme.card, border: `1px solid ${theme.border}`, color: theme.text }} aria-label={t("profile.anonymousQuestions")}>
       <h2 className="flex items-center gap-1.5 text-[10px] uppercase tracking-wider" style={{ color: theme.muted }}>
         <MessageCircleQuestion className="h-3 w-3" aria-hidden />  {t("profile.askMe")} </h2>
+      {locked ? (
+        <p role="status" className="mt-2 rounded-lg px-2.5 py-2 text-xs" style={{ border: `1px solid ${theme.border}`, color: theme.muted }}>
+          {access.data?.level === "disabled" ? MESSAGES["not_found"] : MINOR_QA_NOTICE}
+        </p>
+      ) : (
       <form onSubmit={submit} className="mt-2 flex flex-col gap-1.5">
         <textarea
           value={body}
@@ -62,6 +71,7 @@ export function ProfileQuestions({ handle, theme }: { handle: string; theme: The
             {busy && <Loader2 className="h-3 w-3 animate-spin" />}  {t("profile.sendQuestion")} </button>
         </span>
       </form>
+      )}
       {items.length > 0 && (
         <ul className="mt-3 space-y-2">
           {items.map((it) => (

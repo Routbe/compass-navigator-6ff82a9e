@@ -206,7 +206,7 @@
   "auth.signupConsent.terms": "Allgemeinen Geschäftsbedingungen",
   "auth.signupConsent.and": "und die",
   "auth.signupConsent.privacy": "Datenschutzerklärung",
-  "auth.signupConsent.after": "und bestätige, dass ich 16 Jahre oder älter bin (oder die Zustimmung eines Elternteils/Vormunds habe).",
+  "auth.signupConsent.after": "und bestätige, dass meine Angaben stimmen.",
   "auth.signupConsent.required": "Setze das Häkchen, um dein Konto zu erstellen.",
   "auth.signupConsent.implicitBefore": "Mit der Anmeldung akzeptierst du die",
   "auth.signupConsent.termsShort": "Bedingungen",

@@ -32,6 +32,17 @@ export const startWalletTopupCheckout = createServerFn({ method: "POST" })
   .handler(async ({ data, context }) => {
     const { getRequest } = await import("@tanstack/react-start/server");
     const { trustedCheckoutOrigin } = await import("./verification.server");
+    const { isMinorUser, requestParentPayment } = await import("./minor-safety.server");
+    if (await isMinorUser(context.userId)) {
+      const mailed = await requestParentPayment(context.userId, {
+        kind: "wallet_topup",
+        label: `ROUT-tegoed opwaarderen`,
+        amountCents: data.amountCents,
+      });
+      return mailed
+        ? { ok: false as const, reason: "parent_approval_sent" }
+        : { ok: false as const, reason: "parent_approval_failed" };
+    }
     const { startWalletTopup } = await import("./wallet.server");
     const origin = trustedCheckoutOrigin(getRequest(), data.origin);
     return startWalletTopup({

@@ -1,8 +1,7 @@
 /**
- * Sign-up consent (terms + privacy + 16+ or guardian consent, EU digital
- * consent age). No birth date is ever collected: the member confirms with one
- * checkbox and the browser sends this header with the local sign-up request.
- * The auth endpoint refuses a local sign-up without it.
+ * Sign-up consent (terms + privacy). The birth date and, under 16, a parent
+ * email travel as separate headers (minor-safety.ts, db/0174); the auth
+ * endpoint refuses a local sign-up without consent or with invalid age fields.
  */
 export const SIGNUP_CONSENT_HEADER = "x-rout-consent";
 export const SIGNUP_CONSENT_VERSION = "terms-privacy-16plus-v1";

@@ -206,7 +206,7 @@
   "auth.signupConsent.terms": "Conditions générales",
   "auth.signupConsent.and": "et la",
   "auth.signupConsent.privacy": "Politique de confidentialité",
-  "auth.signupConsent.after": "et je confirme avoir 16 ans ou plus (ou l'accord d'un parent/tuteur).",
+  "auth.signupConsent.after": "et confirme que mes informations sont exactes.",
   "auth.signupConsent.required": "Cochez la case pour créer votre compte.",
   "auth.signupConsent.implicitBefore": "En vous connectant, vous acceptez les",
   "auth.signupConsent.termsShort": "Conditions",
