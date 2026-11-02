@@ -62,14 +62,14 @@ function ConnectPage() {
 
   if (loading || query === null || (user && clientId)) {
     return (
-      <main className="dark flex min-h-screen items-center justify-center bg-background text-sm text-muted-foreground">
+      <main className="flex min-h-screen items-center justify-center bg-background text-sm text-muted-foreground">
         <Loader2 className="h-5 w-5 animate-spin" aria-label={t("connect.loading")} />
       </main>
     );
   }
 
   return (
-    <main className="dark flex min-h-screen items-center justify-center bg-background p-6 text-foreground">
+    <main className="flex min-h-screen items-center justify-center bg-background p-6 text-foreground">
       <div className="w-full max-w-md rounded-3xl border border-border bg-card p-8 shadow-2xl">
         <div className="flex items-center justify-center gap-3">
           {app?.logoUrl ? (
