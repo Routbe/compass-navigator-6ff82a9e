@@ -1971,6 +1971,135 @@
     },
     {
       "schema": "public",
+      "name": "agent_audit_logs",
+      "columns": [
+        {
+          "name": "id",
+          "type": "uuid",
+          "notNull": true,
+          "default": "gen_random_uuid()",
+          "identity": null,
+          "generated": null
+        },
+        {
+          "name": "workspace_id",
+          "type": "uuid",
+          "notNull": false,
+          "default": null,
+          "identity": null,
+          "generated": null
+        },
+        {
+          "name": "user_id",
+          "type": "uuid",
+          "notNull": true,
+          "default": null,
+          "identity": null,
+          "generated": null
+        },
+        {
+          "name": "actor_client_id",
+          "type": "text",
+          "notNull": true,
+          "default": null,
+          "identity": null,
+          "generated": null
+        },
+        {
+          "name": "action",
+          "type": "text",
+          "notNull": true,
+          "default": null,
+          "identity": null,
+          "generated": null
+        },
+        {
+          "name": "target_table",
+          "type": "text",
+          "notNull": false,
+          "default": null,
+          "identity": null,
+          "generated": null
+        },
+        {
+          "name": "target_id",
+          "type": "text",
+          "notNull": false,
+          "default": null,
+          "identity": null,
+          "generated": null
+        },
+        {
+          "name": "previous_state",
+          "type": "jsonb",
+          "notNull": false,
+          "default": null,
+          "identity": null,
+          "generated": null
+        },
+        {
+          "name": "new_state",
+          "type": "jsonb",
+          "notNull": false,
+          "default": null,
+          "identity": null,
+          "generated": null
+        },
+        {
+          "name": "reverted_at",
+          "type": "timestamp with time zone",
+          "notNull": false,
+          "default": null,
+          "identity": null,
+          "generated": null
+        },
+        {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "notNull": true,
+          "default": "now()",
+          "identity": null,
+          "generated": null
+        }
+      ],
+      "constraints": [
+        {
+          "name": "agent_audit_logs_pkey",
+          "kind": "p",
+          "def": "PRIMARY KEY (id)"
+        },
+        {
+          "name": "agent_audit_logs_workspace_id_fkey",
+          "kind": "f",
+          "def": "FOREIGN KEY (workspace_id) REFERENCES workspaces(id) ON DELETE CASCADE"
+        }
+      ],
+      "indexes": [
+        "CREATE INDEX agent_audit_logs_workspace_idx ON public.agent_audit_logs USING btree (workspace_id, created_at DESC)"
+      ],
+      "triggers": [],
+      "rls": true,
+      "forceRls": false,
+      "policies": [
+        {
+          "name": "rout_agent_audit_read",
+          "permissive": true,
+          "roles": [
+            "public"
+          ],
+          "cmd": "SELECT",
+          "using": "((user_id = rout_current_user_id()) OR ((workspace_id IS NOT NULL) AND (rout_workspace_role(workspace_id) = ANY (ARRAY['owner'::text, 'admin'::text]))))",
+          "check": null
+        }
+      ],
+      "grants": {
+        "rout_app": [
+          "SELECT"
+        ]
+      }
+    },
+    {
+      "schema": "public",
       "name": "agent_workspace_claims",
       "columns": [
         {
@@ -10991,9 +11120,22 @@
           "default": null,
           "identity": null,
           "generated": null
+        },
+        {
+          "name": "agent_webhook_url",
+          "type": "text",
+          "notNull": false,
+          "default": null,
+          "identity": null,
+          "generated": null
         }
       ],
       "constraints": [
+        {
+          "name": "oauth_clients_agent_webhook_https",
+          "kind": "c",
+          "def": "CHECK (((agent_webhook_url IS NULL) OR ((agent_webhook_url ~~ 'https://%'::text) AND (char_length(agent_webhook_url) <= 2048))))"
+        },
         {
           "name": "oauth_clients_backchannel_url_https",
           "kind": "c",
@@ -21502,6 +21644,169 @@
     },
     {
       "schema": "public",
+      "name": "workspace_social_links",
+      "columns": [
+        {
+          "name": "id",
+          "type": "uuid",
+          "notNull": true,
+          "default": "gen_random_uuid()",
+          "identity": null,
+          "generated": null
+        },
+        {
+          "name": "workspace_id",
+          "type": "uuid",
+          "notNull": true,
+          "default": null,
+          "identity": null,
+          "generated": null
+        },
+        {
+          "name": "platform",
+          "type": "text",
+          "notNull": true,
+          "default": null,
+          "identity": null,
+          "generated": null
+        },
+        {
+          "name": "username",
+          "type": "text",
+          "notNull": true,
+          "default": null,
+          "identity": null,
+          "generated": null
+        },
+        {
+          "name": "is_verified",
+          "type": "boolean",
+          "notNull": true,
+          "default": "false",
+          "identity": null,
+          "generated": null
+        },
+        {
+          "name": "follower_count",
+          "type": "integer",
+          "notNull": false,
+          "default": null,
+          "identity": null,
+          "generated": null
+        },
+        {
+          "name": "verified_at",
+          "type": "timestamp with time zone",
+          "notNull": false,
+          "default": null,
+          "identity": null,
+          "generated": null
+        },
+        {
+          "name": "last_synced_at",
+          "type": "timestamp with time zone",
+          "notNull": false,
+          "default": null,
+          "identity": null,
+          "generated": null
+        },
+        {
+          "name": "last_error",
+          "type": "text",
+          "notNull": false,
+          "default": null,
+          "identity": null,
+          "generated": null
+        },
+        {
+          "name": "created_by",
+          "type": "uuid",
+          "notNull": false,
+          "default": null,
+          "identity": null,
+          "generated": null
+        },
+        {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "notNull": true,
+          "default": "now()",
+          "identity": null,
+          "generated": null
+        },
+        {
+          "name": "updated_at",
+          "type": "timestamp with time zone",
+          "notNull": true,
+          "default": "now()",
+          "identity": null,
+          "generated": null
+        }
+      ],
+      "constraints": [
+        {
+          "name": "workspace_social_links_created_by_fkey",
+          "kind": "f",
+          "def": "FOREIGN KEY (created_by) REFERENCES users(id) ON DELETE SET NULL"
+        },
+        {
+          "name": "workspace_social_links_pkey",
+          "kind": "p",
+          "def": "PRIMARY KEY (id)"
+        },
+        {
+          "name": "workspace_social_links_platform_check",
+          "kind": "c",
+          "def": "CHECK ((platform = ANY (ARRAY['x'::text, 'instagram'::text, 'tiktok'::text, 'youtube'::text, 'github'::text, 'mastodon'::text, 'bluesky'::text, 'wsocial'::text])))"
+        },
+        {
+          "name": "workspace_social_links_unique",
+          "kind": "u",
+          "def": "UNIQUE (workspace_id, platform)"
+        },
+        {
+          "name": "workspace_social_links_workspace_id_fkey",
+          "kind": "f",
+          "def": "FOREIGN KEY (workspace_id) REFERENCES workspaces(id) ON DELETE CASCADE"
+        }
+      ],
+      "indexes": [],
+      "triggers": [],
+      "rls": true,
+      "forceRls": false,
+      "policies": [
+        {
+          "name": "rout_editor_write",
+          "permissive": true,
+          "roles": [
+            "public"
+          ],
+          "cmd": "ALL",
+          "using": "(rout_workspace_role(workspace_id) = ANY (ARRAY['owner'::text, 'admin'::text, 'editor'::text]))",
+          "check": "(rout_workspace_role(workspace_id) = ANY (ARRAY['owner'::text, 'admin'::text, 'editor'::text]))"
+        },
+        {
+          "name": "rout_member_read",
+          "permissive": true,
+          "roles": [
+            "public"
+          ],
+          "cmd": "SELECT",
+          "using": "rout_is_workspace_member(workspace_id)",
+          "check": null
+        }
+      ],
+      "grants": {
+        "rout_app": [
+          "DELETE",
+          "INSERT",
+          "SELECT",
+          "UPDATE"
+        ]
+      }
+    },
+    {
+      "schema": "public",
       "name": "workspace_transfers",
       "columns": [
         {
@@ -21815,9 +22120,38 @@
           "default": "'{}'::jsonb",
           "identity": null,
           "generated": null
+        },
+        {
+          "name": "bluesky_did",
+          "type": "text",
+          "notNull": false,
+          "default": null,
+          "identity": null,
+          "generated": null
+        },
+        {
+          "name": "bluesky_handle",
+          "type": "text",
+          "notNull": false,
+          "default": null,
+          "identity": null,
+          "generated": null
+        },
+        {
+          "name": "icon",
+          "type": "text",
+          "notNull": false,
+          "default": null,
+          "identity": null,
+          "generated": null
         }
       ],
       "constraints": [
+        {
+          "name": "workspaces_bluesky_did_check",
+          "kind": "c",
+          "def": "CHECK (((bluesky_did IS NULL) OR (bluesky_did ~ '^did:(plc|web):[a-zA-Z0-9._:%-]{1,200}$'::text)))"
+        },
         {
           "name": "workspaces_category_check",
           "kind": "c",
@@ -21827,6 +22161,11 @@
           "name": "workspaces_description_len",
           "kind": "c",
           "def": "CHECK (((description IS NULL) OR (char_length(description) <= 280)))"
+        },
+        {
+          "name": "workspaces_icon_key",
+          "kind": "c",
+          "def": "CHECK (((icon IS NULL) OR (icon ~ '^[a-z][a-z0-9-]{1,23}$'::text)))"
         },
         {
           "name": "workspaces_legacy_user_id_fkey",
@@ -22363,6 +22702,24 @@
     },
     {
       "schema": "public",
+      "name": "rout_agent_audit_log",
+      "args": "p_workspace_id uuid, p_user_id uuid, p_client_id text, p_action text, p_target_table text, p_target_id text, p_previous jsonb, p_new jsonb",
+      "def": "CREATE OR REPLACE FUNCTION public.rout_agent_audit_log(p_workspace_id uuid, p_user_id uuid, p_client_id text, p_action text, p_target_table text, p_target_id text, p_previous jsonb, p_new jsonb)\n RETURNS uuid\n LANGUAGE plpgsql\n SECURITY DEFINER\n SET search_path TO 'public'\nAS $function$\n  declare v_id uuid;\n  begin\n    if p_user_id is distinct from public.rout_current_user_id() then\n      raise exception 'actor_mismatch';\n    end if;\n    insert into public.agent_audit_logs\n      (workspace_id, user_id, actor_client_id, action, target_table, target_id, previous_state, new_state)\n    values (p_workspace_id, p_user_id, p_client_id, p_action, p_target_table, p_target_id, p_previous, p_new)\n    returning id into v_id;\n    return v_id;\n  end $function$"
+    },
+    {
+      "schema": "public",
+      "name": "rout_agent_audit_mark_reverted",
+      "args": "p_log_id uuid",
+      "def": "CREATE OR REPLACE FUNCTION public.rout_agent_audit_mark_reverted(p_log_id uuid)\n RETURNS void\n LANGUAGE plpgsql\n SECURITY DEFINER\n SET search_path TO 'public'\nAS $function$\n  begin\n    update public.agent_audit_logs l\n       set reverted_at = now()\n     where l.id = p_log_id\n       and l.reverted_at is null\n       and public.rout_workspace_role(l.workspace_id) in ('owner', 'admin');\n    if not found then raise exception 'revert_not_allowed'; end if;\n  end $function$"
+    },
+    {
+      "schema": "public",
+      "name": "rout_agent_audit_revert_workspace",
+      "args": "p_workspace_id uuid",
+      "def": "CREATE OR REPLACE FUNCTION public.rout_agent_audit_revert_workspace(p_workspace_id uuid)\n RETURNS void\n LANGUAGE plpgsql\n SECURITY DEFINER\n SET search_path TO 'public'\nAS $function$\n  begin\n    delete from public.workspaces w\n     where w.id = p_workspace_id\n       and exists (\n         select 1 from public.agent_workspace_claims c\n          where c.workspace_id = w.id\n            and c.claimed_at is null\n            and c.requested_by = public.rout_current_user_id()\n       );\n    if not found then raise exception 'revert_not_allowed'; end if;\n  end $function$"
+    },
+    {
+      "schema": "public",
       "name": "rout_agent_claim_preview",
       "args": "p_token_hash text",
       "def": "CREATE OR REPLACE FUNCTION public.rout_agent_claim_preview(p_token_hash text)\n RETURNS TABLE(name text, slug text, expires_at timestamp with time zone, claimed boolean, expired boolean, app_name text)\n LANGUAGE sql\n STABLE SECURITY DEFINER\n SET search_path TO 'public'\nAS $function$\n  select w.name, w.slug, c.expires_at, c.claimed_at is not null, c.expires_at <= now(),\n         (select o.name from public.oauth_clients o where o.client_id = c.client_id limit 1)\n    from public.agent_workspace_claims c\n    join public.workspaces w on w.id = c.workspace_id\n   where public.rout_current_user_id() is not null and c.token_hash = p_token_hash\n   limit 1\n$function$"
@@ -22405,9 +22762,21 @@
     },
     {
       "schema": "public",
+      "name": "rout_migrated_workspace_for_handle",
+      "args": "p_handle text, p_space text",
+      "def": "CREATE OR REPLACE FUNCTION public.rout_migrated_workspace_for_handle(p_handle text, p_space text)\n RETURNS text\n LANGUAGE sql\n STABLE SECURITY DEFINER\n SET search_path TO 'public'\nAS $function$\n  select w.slug\n    from public.users u\n    join public.workspaces w on w.id = u.migrated_to_workspace_id\n   where u.account_status = 'migrated_sunset'\n     and u.sunset_at > now()\n     and u.id = case\n       when p_space = 'alias' then (select a.user_id from public.alias_profiles a where lower(a.handle) = lower(p_handle) limit 1)\n       else (select p.id from public.profiles p where lower(p.username) = lower(p_handle) limit 1)\n     end\n   limit 1\n$function$"
+    },
+    {
+      "schema": "public",
       "name": "rout_public_workspace",
       "args": "p_slug text",
       "def": "CREATE OR REPLACE FUNCTION public.rout_public_workspace(p_slug text)\n RETURNS TABLE(name text, slug text, avatar_url text, description text, domain text, profile_handle text, public_profile jsonb)\n LANGUAGE sql\n STABLE SECURITY DEFINER\n SET search_path TO 'public'\nAS $function$\n  select w.name, w.slug, w.avatar_url, w.description,\n         case when w.domain_verified_at is not null then w.domain end,\n         (select p.username from public.profiles p\n           where p.workspace_id = w.id and coalesce((p.display_prefs->>'publicProfile')::boolean, true)\n           order by p.created_at limit 1),\n         case when coalesce((w.public_profile->>'published')::boolean, false) then w.public_profile else '{}'::jsonb end\n  from public.workspaces w where w.slug = lower(p_slug) limit 1 $function$"
+    },
+    {
+      "schema": "public",
+      "name": "rout_public_workspace_relme",
+      "args": "p_slug text",
+      "def": "CREATE OR REPLACE FUNCTION public.rout_public_workspace_relme(p_slug text)\n RETURNS TABLE(platform text, username text)\n LANGUAGE sql\n STABLE SECURITY DEFINER\n SET search_path TO 'public'\nAS $function$\n  select s.platform, s.username\n    from public.workspace_social_links s\n    join public.workspaces w on w.id = s.workspace_id\n   where w.slug = lower(p_slug) and s.platform in ('mastodon', 'github')\n$function$"
     },
     {
       "schema": "public",
@@ -22435,9 +22804,21 @@
     },
     {
       "schema": "public",
+      "name": "rout_workspace_atproto_did",
+      "args": "p_slug text, p_domain text",
+      "def": "CREATE OR REPLACE FUNCTION public.rout_workspace_atproto_did(p_slug text, p_domain text)\n RETURNS text\n LANGUAGE sql\n STABLE SECURITY DEFINER\n SET search_path TO 'public'\nAS $function$\n  select w.bluesky_did from public.workspaces w\n   where (p_slug is not null and w.slug = lower(p_slug))\n      or (p_domain is not null and w.domain_verified_at is not null and lower(w.domain) = lower(p_domain))\n   limit 1\n$function$"
+    },
+    {
+      "schema": "public",
       "name": "rout_workspace_role",
       "args": "ws uuid",
       "def": "CREATE OR REPLACE FUNCTION public.rout_workspace_role(ws uuid)\n RETURNS text\n LANGUAGE sql\n STABLE SECURITY DEFINER\n SET search_path TO 'public'\nAS $function$ select role::text from public.workspace_members\n        where workspace_id = ws and user_id = public.rout_current_user_id() limit 1 $function$"
+    },
+    {
+      "schema": "public",
+      "name": "rout_workspace_slug_for_domain",
+      "args": "p_domain text",
+      "def": "CREATE OR REPLACE FUNCTION public.rout_workspace_slug_for_domain(p_domain text)\n RETURNS text\n LANGUAGE sql\n STABLE SECURITY DEFINER\n SET search_path TO 'public'\nAS $function$\n  select w.slug from public.workspaces w\n   where w.domain_verified_at is not null and lower(w.domain) = lower(p_domain)\n   limit 1\n$function$"
     },
     {
       "schema": "public",

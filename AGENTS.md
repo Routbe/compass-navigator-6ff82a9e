@@ -11,7 +11,7 @@
 
 ## Repository import
 - This project is a repository import of the ROUT app (`github.com/Routbe/compass-navigator-52`, 2026-11-02); its database, accounts and provider credentials still belong to the original deployment, so nothing is applied or connected here until the user supplies them. Why: imported services belong to a different deployment.
-- The two failing tests (`src/test/migration-order.test.ts`, `src/test/migration-replay.test.ts`) report pre-existing drift inside the imported `db/` scripts — a duplicated migration number and an out-of-date schema snapshot — and must be reconciled against the live database, not by silently renaming migrations or regenerating the snapshot. Why: those files record what has already been applied.
+- Every `db/` script keeps a unique number; a script may be renumbered only to a free number that leaves every dependent script after it, and the offline record (`db/schema.snapshot.json`, `src/lib/db-types.gen.ts`) is rebuilt with `bun scripts/schema-replay-snapshot.ts` whenever `db/` changes. Why: the user approved renumbering the duplicated 0169 script and rebuilding the record, and whether each script reached the live database stays their own check.
 - Preserve the imported ROUT source structure, route handlers and design; this is a source import, not a website capture.
 
 - Keep the managed TanStack Start and Cloudflare configuration; MDX catalog plugins are required by the imported documentation.

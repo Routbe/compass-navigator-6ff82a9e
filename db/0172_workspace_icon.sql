@@ -1,4 +1,4 @@
--- 0169: optional icon choice for a workspace. NULL means "derive from category".
+-- 0172: optional icon choice for a workspace. NULL means "derive from category".
 -- Uploaded logos keep using workspaces.avatar_url (an image URL); this column
 -- only stores a key from the app's fixed icon set (src/lib/workspace-icons.ts).
 alter table public.workspaces add column if not exists icon text;

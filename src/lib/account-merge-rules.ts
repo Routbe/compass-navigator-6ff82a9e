@@ -42,6 +42,9 @@ export const MERGE_TABLES: Readonly<Record<string, MergeTableRule>> = {
   // Append-only audit trails without FK: history stays as written.
   security_audit_logs: r("retain"),
   identity_link_events: r("retain"),
+  // Chronos agent audit (0168): hash-chained, no FK to users — history stays as written.
+  agent_audit_logs: r("retain"),
+
   user_ledger_keys: r("skip"),
   user_encrypted_audit_logs: r("skip"),
   account_email_changes: r("skip"),

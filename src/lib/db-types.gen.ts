@@ -207,6 +207,20 @@ export interface PublicAdminPermissionsRow {
   "created_at": string | Date;
 }
 
+export interface PublicAgentAuditLogsRow {
+  "id": string;
+  "workspace_id": string | null;
+  "user_id": string;
+  "actor_client_id": string;
+  "action": string;
+  "target_table": string | null;
+  "target_id": string | null;
+  "previous_state": JsonValue | null;
+  "new_state": JsonValue | null;
+  "reverted_at": string | Date | null;
+  "created_at": string | Date;
+}
+
 export interface PublicAgentWorkspaceClaimsRow {
   "workspace_id": string;
   "client_id": string;
@@ -1056,6 +1070,7 @@ export interface PublicOauthClientsRow {
   "backchannel_webhook_url": string | null;
   "backchannel_webhook_secret_sealed": string | null;
   "backchannel_webhook_secret_iv": string | null;
+  "agent_webhook_url": string | null;
 }
 
 export interface PublicOauthConsentsRow {
@@ -2044,6 +2059,21 @@ export interface PublicWorkspaceRootAliasesRow {
   "created_at": string | Date;
 }
 
+export interface PublicWorkspaceSocialLinksRow {
+  "id": string;
+  "workspace_id": string;
+  "platform": string;
+  "username": string;
+  "is_verified": boolean;
+  "follower_count": number | null;
+  "verified_at": string | Date | null;
+  "last_synced_at": string | Date | null;
+  "last_error": string | null;
+  "created_by": string | null;
+  "created_at": string | Date;
+  "updated_at": string | Date;
+}
+
 export interface PublicWorkspaceTransfersRow {
   "id": string;
   "source_user_id": string;
@@ -2077,6 +2107,9 @@ export interface PublicWorkspacesRow {
   "description": string | null;
   "category": string | null;
   "public_profile": JsonValue;
+  "bluesky_did": string | null;
+  "bluesky_handle": string | null;
+  "icon": string | null;
 }
 
 export interface StorageBucketsRow {
@@ -2115,6 +2148,7 @@ export interface DbTables {
   "public.admin_audit_log": PublicAdminAuditLogRow;
   "public.admin_bootstrap_tokens": PublicAdminBootstrapTokensRow;
   "public.admin_permissions": PublicAdminPermissionsRow;
+  "public.agent_audit_logs": PublicAgentAuditLogsRow;
   "public.agent_workspace_claims": PublicAgentWorkspaceClaimsRow;
   "public.alias_profiles": PublicAliasProfilesRow;
   "public.alias_sync_jobs": PublicAliasSyncJobsRow;
@@ -2266,6 +2300,7 @@ export interface DbTables {
   "public.workspace_members": PublicWorkspaceMembersRow;
   "public.workspace_profile_drafts": PublicWorkspaceProfileDraftsRow;
   "public.workspace_root_aliases": PublicWorkspaceRootAliasesRow;
+  "public.workspace_social_links": PublicWorkspaceSocialLinksRow;
   "public.workspace_transfers": PublicWorkspaceTransfersRow;
   "public.workspaces": PublicWorkspacesRow;
   "storage.buckets": StorageBucketsRow;
