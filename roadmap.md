@@ -30,7 +30,7 @@
 - [x] Workspace username: editable chosen part (4-char suffix fixed) + use verified domain as username button
 
 ## Nov 2 (14:52) request
-- [ ] Mastodon form: username + server fields, prefilled, rel="me" snippet, copy buttons for user.rout.be / rout.be/user (choose one or both)
-- [ ] GitHub website verification guidance (same addresses)
-- [ ] Workspace Studio Bluesky block (username.w.rout.be / domain.rout.be)
-- [ ] DNS: *.w.rout.be wildcard + per-name certificates for domain.rout.be — user's DNS/hosting action
+- [x] Mastodon form: username + server fields, prefilled, rel="me" snippet, copy buttons for user.rout.be / rout.be/user (choose one or both)
+- [x] GitHub website verification guidance (same addresses)
+- [x] Workspace Studio Bluesky block (username.w.rout.be / domain.rout.be)
+- [ ] DNS: *.w.rout.be wildcard + per-name certificates for domain.rout.be — blocked: needs the user at their rout.be DNS/hosting provider
