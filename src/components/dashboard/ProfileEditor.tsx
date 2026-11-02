@@ -2090,6 +2090,8 @@ export function ProfileEditor({ variant = "verified", pageMode = "profile", onPa
                 <>
                   <Loader2 className="h-3 w-3 shrink-0 animate-spin" aria-hidden /> {t("studio.editor.saving")}
                 </>
+              ) : dirty && !handleOk ? (
+                <span className="truncate text-destructive">{t("studio.editor.notSaved")}{handleProblem || strictIssue ? ` — ${handleProblem ?? strictIssue}` : ""}</span>
               ) : dirty ? (
                 <>
                   <Loader2 className="h-3 w-3 shrink-0 animate-spin" aria-hidden /> {t("studio.editor.changesSaving")}
