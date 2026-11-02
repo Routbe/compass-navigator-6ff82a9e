@@ -19,6 +19,8 @@ export interface CommandCenterData {
   guestbook30d: number | null;
   upcomingBookings: number | null;
   nextBookingAt: string | null;
+  /** Today's confirmed appointments (Europe/Brussels day), earliest first. */
+  todayBookings?: { id: string; guest: string; at: string }[];
   events: ChronosEvent[];
 }
 
@@ -49,7 +51,7 @@ export const getCommandCenter = createServerFn({ method: "GET" })
     };
     const count = (rows: Row[]) => Number(rows[0]?.["n"] ?? 0);
 
-    const [apps, relays, unread, questions, guestbook, bookings, nextBooking, notes, qRows, gRows, logins, bRows, cRows, dRows] =
+    const [apps, relays, unread, questions, guestbook, bookings, nextBooking, notes, qRows, gRows, logins, bRows, cRows, dRows, tRows] =
       await Promise.all([
         safe(async () => count((await sql`select count(*)::int as n from public.oauth_consents where user_id = ${uid} and revoked_at is null`) as Row[]), null),
         safe(async () => count((await sql`select count(*)::int as n from public.identity_relays where user_id = ${uid} and status = 'active'`) as Row[]), null),
@@ -75,6 +77,9 @@ export const getCommandCenter = createServerFn({ method: "GET" })
             join public.oauth_email_forwarding_rules r on r.id = d.rule_id
             left join public.oauth_clients c on c.client_id = r.client_id
             where d.user_id = ${uid} order by d.created_at desc limit 6`) as Row[], []),
+        safe(async () => (await sql`select id, guest_name, start_utc from public.bookings where host_user_id = ${uid}
+            and (start_utc at time zone 'Europe/Brussels')::date = (now() at time zone 'Europe/Brussels')::date
+            and status not in ('cancelled', 'canceled', 'declined', 'expired', 'held') order by start_utc asc limit 5`) as Row[], []),
       ]);
 
     const events: ChronosEvent[] = [
@@ -97,6 +102,7 @@ export const getCommandCenter = createServerFn({ method: "GET" })
       guestbook30d: guestbook,
       upcomingBookings: bookings,
       nextBookingAt: nextBooking,
+      todayBookings: tRows.map((r) => ({ id: String(r["id"]), guest: String(r["guest_name"] ?? "Gast"), at: iso(r["start_utc"]) })),
       events,
     };
   });
