@@ -7,6 +7,18 @@
     "fetched": "2026-11-02T13:09Z",
     "note": "Public repository downloaded as an archive and inspected read-only. Its .env (real backend credentials) was excluded from inspection and is never copied into this project."
   },
+  "decisions": [
+    {
+      "decision": "The application database and accounts stay in the user's own Neon PostgreSQL; Lovable Cloud is not used for app data.",
+      "decided": "2026-11-02",
+      "consequence": "The app's existing gateway transport (NEON_API_KEY + LOVABLE_API_KEY) is what it already expects, so no data-layer rewrite is needed once the Neon connection is linked to this project."
+    },
+    {
+      "decision": "Renumber the duplicated 0169 script and rebuild the offline schema record so the migration checks pass.",
+      "decided": "2026-11-02",
+      "consequence": "db/0169_workspace_icon.sql became db/0172_workspace_icon.sql (the other 0169 script had to keep its number because db/0171 reads the table it creates); db/schema.snapshot.json and src/lib/db-types.gen.ts were rebuilt with the project's own offline replay script."
+    }
+  ],
   "capabilities": [
     {
       "capability": "application code, 255 routes, components, MDX documentation content",
@@ -31,45 +43,52 @@
     },
     {
       "capability": "database schema (176 tables, 174 reviewed SQL scripts)",
-      "source": "db/*.sql + drizzle/migrations (Neon PostgreSQL)",
-      "outcome": "kept in the repository for review; not applied automatically",
-      "status": "pending",
-      "next_action": "Decide the target backend: run against the original Neon database, or rebuild the schema in Lovable Cloud. Then apply the reviewed scripts."
+      "source": "db/*.sql (Neon PostgreSQL)",
+      "outcome": "scripts kept for review; duplicate number 0169 resolved, offline record rebuilt",
+      "status": "reconciled, awaiting live check",
+      "next_action": "Confirm in Neon which scripts were applied: the renamed db/0172_workspace_icon.sql now looks un-applied to the migration runner, and its statements are idempotent so re-applying is safe."
     },
     {
       "capability": "application records (profiles, links, bookings, workspaces, analytics)",
-      "source": "Neon PostgreSQL (no export attached)",
-      "outcome": "not present in this project",
+      "source": "Neon PostgreSQL",
+      "outcome": "stays in Neon; the app will read it through the linked connection",
       "status": "pending",
-      "next_action": "Provide CSV/JSON exports of the application tables from Neon."
+      "next_action": "Link the Neon connection, then verify reads and one write end to end."
     },
     {
       "capability": "user accounts and identities",
       "source": "Neon (better-auth tables: user, account, session, passkey, organization, member)",
-      "outcome": "not present in this project",
+      "outcome": "stays in Neon; sign-in architecture preserved as-is",
       "status": "pending",
-      "next_action": "Provide a users export (email addresses and original user IDs) to import; existing users then verify email and set a new password."
+      "next_action": "Link the Neon connection, then verify sign-up, sign-in, passkey and OIDC flows."
     },
     {
       "capability": "sign-in and sessions (better-auth, httpOnly rout_session cookie, passkeys, 2FA, OIDC provider)",
       "source": "src/lib/better-auth.server.ts, src/routes/api_.auth.$.ts, src/lib/auth/*",
-      "outcome": "code preserved as-is; needs a database to function",
+      "outcome": "code preserved; needs the Neon connection to function",
       "status": "pending",
-      "next_action": "After the backend decision, verify sign-up, sign-in, passkey and OIDC flows end to end."
+      "next_action": "Verify live authentication once the connection is linked."
     },
     {
       "capability": "authorization and row-level security (rout_app least-privilege role, RLS, admin grants, audit chain)",
       "source": "db/0117, db/0120, db/0126, db/0127, src/lib/admin-*.server.ts",
-      "outcome": "code preserved; RLS lives in the database and must be recreated with the schema",
+      "outcome": "code preserved; RLS lives in the user's database and is unchanged",
       "status": "pending",
-      "next_action": "Recreate role + RLS in the chosen backend and verify one member cannot read another's rows."
+      "next_action": "Verify one member cannot read another's rows through the linked connection."
+    },
+    {
+      "capability": "account merge rules",
+      "source": "src/lib/account-merge-rules.ts",
+      "outcome": "agent_audit_logs added as append-only (retain), matching security_audit_logs; rebuilding the record exposed this table to the guard",
+      "status": "migrated, needs the user's confirmation",
+      "next_action": "User confirms that agent audit history should stay under the original user id after a merge."
     },
     {
       "capability": "file storage",
       "source": "Scaleway Object Storage (SCALEWAY_* / S3_* variables, aws4fetch signing)",
       "outcome": "provider preserved in code",
       "status": "pending",
-      "next_action": "Supply Scaleway keys securely in chat when verification is ready, or switch uploads to Lovable Cloud storage."
+      "next_action": "Supply Scaleway keys securely in chat when verification is ready."
     },
     {
       "capability": "transactional email",
@@ -90,7 +109,7 @@
       "source": "Lovable AI gateway (LOVABLE_API_KEY)",
       "outcome": "provider preserved in code",
       "status": "pending",
-      "next_action": "Gateway key is issued by Lovable; verify bio-assistance and contact triage after the backend runs."
+      "next_action": "Verify bio-assistance and contact triage once the app runs against the database."
     },
     {
       "capability": "third-party profile data",
@@ -130,9 +149,9 @@
     {
       "capability": "verification",
       "source": "vitest suite (270 files) + managed preview build",
-      "outcome": "1522 of 1524 tests pass; public pages, sign-in screen, QR generator and docs all render in the preview",
-      "status": "partially verified",
-      "next_action": "Two failures are pre-existing schema drift in the imported repository (db/ has two scripts numbered 0169, and db/schema.snapshot.json predates them); reconcile with the live database before applying the schema. Live business flows stay blocked until a database is connected."
+      "outcome": "all 1524 tests pass (exit 0); build OK; landing page, about/docs, sign-in screen and QR generator render in the preview",
+      "status": "verified for code; live flows pending",
+      "next_action": "Run the same checks against the live database once the Neon connection is linked."
     }
   ]
 }
