@@ -1,3 +1,4 @@
+import { escapeMailParam } from "@/lib/mail-param-escape";
 import { createFileRoute } from "@tanstack/react-router";
 import { hasDatabase, sql } from "@/lib/neon";
 import { z } from "zod";
@@ -200,19 +201,19 @@ export const Route = createFileRoute("/api/claim-root")({
               templateId: 2,
               to: [{ email: adminEmail }],
               params: {
-                requested_subdomain: requestedSubdomain,
-                cname_source: cleanHandle,
-                user_name: userName,
-                user_email: email,
+                requested_subdomain: escapeMailParam(requestedSubdomain),
+                cname_source: escapeMailParam(cleanHandle),
+                user_name: escapeMailParam(userName),
+                user_email: escapeMailParam(email),
               },
             }),
             sendBrevo(brevoApiKey, {
               templateId: 3,
               to: [{ email }],
               params: {
-                user_name: userName,
-                requested_subdomain: requestedSubdomain,
-                active_subdomain: requestedSubdomain,
+                user_name: escapeMailParam(userName),
+                requested_subdomain: escapeMailParam(requestedSubdomain),
+                active_subdomain: escapeMailParam(requestedSubdomain),
               },
             }),
           ]);
